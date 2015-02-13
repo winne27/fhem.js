@@ -44,33 +44,18 @@ ios.sockets.on('connection', function(socket)
          socket.join(data);
       });
 
-      socket.on('command', function(cmd)
+      socket.on('command', function(data)
       {
-         mylog('command received: ' + cmd);
+         //mylog('command received: ' + data);
          var fhemcmd = net.connect({port: params.fhemPort}, function()
          {
-            fhemcmd.write(cmd + '\r\n');
-            fhemcmd.on('data', function(cmdout)
-            {
-               fhemcmd.end();
-               console.log(cmdout.toString());
-               socket.emit('command',cmdout.toString());
-            });
+            fhemcmd.write(data + '\r\n');
          });
-      });
 
-      socket.on('commandAck', function(cmd,callback)
-      {
-         mylog('commandAck received: ' + cmd);
-         var fhemcmd = net.connect({port: params.fhemPort}, function()
+         fhemcmd.on('data', function(data)
          {
-            fhemcmd.write(cmd + '\r\n');
-            fhemcmd.on('data', function(cmdout)
-            {
-               fhemcmd.end();
-               callback(cmdout.toString().split("\n"));
-               mylog('response: ' + cmdout);
-            });
+            socket.emit('cmd',data);
+            fhemcmd.end();
          });
       });
 
