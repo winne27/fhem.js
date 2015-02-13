@@ -13,8 +13,11 @@ On client side you need socket.io (tested with diverent browsers and with Androi
 On client you can fire the following requests:
 
   'getValueOnce' : delivers a value from fhem once
+  
   'getValuePerm' : delivers a value from fhem and send with websocket updated values
+  
   'command'      : send a fhem command like "list xyz". Response is send back as ack respons
+  
   'commandNoResp': send a fhem command like "set xyz off". No response of this command is send back.
 
 On client side the following receiving data event should be handled:
