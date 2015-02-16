@@ -8,7 +8,7 @@ Have a look to param.js of this package. Adjust telnet port of fhem if neccessar
 
 Run server.js of this package as a node.js service.
 
-On client side you need socket.io (tested with diverent browsers and with Android Java).
+On client side you need socket.io (tested with diverent browsers and with Android Java using java class [com.github.nkzawa.socketio.client](https://github.com/nkzawa/socket.io-client.java) for realizing a websocket connection.).
 
 On client you can fire the following requests:
 
