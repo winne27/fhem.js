@@ -20,11 +20,42 @@ On client side you need socket.io (tested with diverent browsers and with Androi
 
 On client you can fire the following requests:
 
-  * 'getValueOnce' : delivers a value from fhem once
-  * 'getValuePerm' : delivers a value from fhem and send with websocket updated values
+  * 'getValueOnce' : requests a value from fhem once
+  * 'getValuePerm' : requests a value from fhem and subscribes delivery of updated values by websockets connection
   * 'command'      : send a fhem command like "list xyz". Response is send back as ack response
   * 'commandNoResp': send a fhem command like "set xyz off". No response of this command is send back.
 
 On client side the following receiving data event should be handled:
 
-   'value' : (on.socket('value',....) 
+    on.socket('value',....) 
+
+Java example:
+
+    mySocket.socket.on("value", new Emitter.Listener()
+    {
+        @Override
+        public void call(Object... args)
+        {
+            Log.i("get value", args[0].toString());
+            JSONObject obj = (JSONObject) args[0];
+            Iterator<String> iterator = obj.keys();
+            String unit = null;
+            while (iterator.hasNext())
+            {
+               unit = (String) iterator.next();
+               value = obj.getString(unit);
+            }
+        }
+    }
+      
+Javascript example:
+
+    socket.on('value',function(data)
+    {
+        for (unit in data)
+        {
+           var value = data[unit];
+        }
+    })
+
+
