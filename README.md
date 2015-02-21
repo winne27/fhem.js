@@ -27,7 +27,7 @@ On client you can fire the following requests:
 
 On client side the following receiving data event should be handled:
 
-    on.socket('value',....) 
+    socket.on('value',....) 
 
 Java example:
 
