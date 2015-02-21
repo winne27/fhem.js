@@ -7,7 +7,10 @@ It is possible to subscribe for updates of fhem resource stati like on/off or te
 The websocket connection will deliver this values just in time. Furthermore fhem commands could be send other this connection.
 
 # Install
+
 Install first node.js on the server on which fhem is installed. 
+Ensure that telnet is enabled on the standard fhem server.
+
 Install node.js plugin socket.io with
 
     npm install -g socket.io
@@ -17,6 +20,10 @@ Have a look to param.js of this package. Adjust telnet port of fhem if neccessar
 Change to installation directory and start the server with
 
     node.js start server.js
+
+# Operation breakdown
+
+The fhem.js server establishes a permanent telnet connection to the standard fhem server and requests information foe all changed values (command: inform on).  
 
 # Client
 
