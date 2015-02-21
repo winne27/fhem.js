@@ -2,9 +2,9 @@
 
 This is a node.js server which works as a websocket gateway to a [fhem](http://fhem.de) (home automation) server.
 Clients can use socket.io in Javascript and Java to establish a websocket connection to fhem.
+
 It is possible to subscribe for updates of fhem resource stati like on/off or temperature.
-The websocket connection will deliver this values just in time.
-Furthermore fhem commands could be send other this connection.
+The websocket connection will deliver this values just in time. Furthermore fhem commands could be send other this connection.
 
 # Install
 Install first node.js on the server on which fhem is installed. 
