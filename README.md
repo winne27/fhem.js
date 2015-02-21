@@ -2,11 +2,19 @@
 
 This is a node.js server which works as a websocket gateway to a fhem server.
 
-Install node.js on the server on which fhem is installed
+# Install
+Install first node.js on the server on which fhem is installed. 
+Install node.js plugin socket.io with
 
+    npm install -g socket.io
+
+Copy this package to a directory of your choice (e.g. /var/www/fhem.js).
 Have a look to param.js of this package. Adjust telnet port of fhem if neccessary.
+Change to installation directory and start the server with
 
-Run server.js of this package as a node.js service.
+    node.js start server.js
+
+# Client
 
 On client side you need socket.io (tested with diverent browsers and with Android Java using java class [com.github.nkzawa.socketio.client](https://github.com/nkzawa/socket.io-client.java) for realizing a websocket connection.).
 
@@ -20,8 +28,3 @@ On client you can fire the following requests:
 On client side the following receiving data event should be handled:
 
    'value' : (on.socket('value',....) 
-
-
-
-
-More detailed docu will follow soon
