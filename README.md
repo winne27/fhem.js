@@ -23,7 +23,9 @@ Change to installation directory and start the server with
 
 # Operation breakdown
 
-The fhem.js server establishes a permanent telnet connection to the standard fhem server and requests information foe all changed values (command: inform on).  
+The fhem.js server establishes a permanent telnet connection to the standard fhem server and requests information for all changed values (command: inform on). It also forwards commands and responses between clients and the fhem server.
+
+Communication to clients with websockets were realized by the socket.io package.
 
 # Client
 
