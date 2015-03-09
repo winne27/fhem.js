@@ -99,6 +99,7 @@ On client side the following receiving data event should be handled:
 **Java example for getAllUnitsOf** (with "LightScene" as argument type):
 
    ...
+   
    mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
    {
       @Override
@@ -113,4 +114,6 @@ On client side the following receiving data event should be handled:
          }
       }
    });
+   
    ...
+   
