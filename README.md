@@ -31,6 +31,11 @@ Communication to clients with websockets were realized by the socket.io package.
 
 On client side you need socket.io (tested with diverent browsers and with Android Java using java class [com.github.nkzawa.socketio.client](https://github.com/nkzawa/socket.io-client.java) for realizing a websocket connection.).
 
+Establish connection to node.js server by:
+
+     socket = IO.socket(url, options);        
+     socket.connect();
+
 On client you can fire the following requests:
 
   * 'getValueOnce'     : requests a value from fhem once
@@ -45,7 +50,7 @@ On client side the following receiving data event should be handled:
 
     socket.on('value',....) 
 
-Java example:
+**Java example:**
 
     mySocket.socket.on("value", new Emitter.Listener()
     {
@@ -64,7 +69,7 @@ Java example:
         }
     }
       
-Javascript example:
+**Javascript example:**
 
     socket.on('value',function(data)
     {
@@ -74,7 +79,7 @@ Javascript example:
         }
     })
 
-Java example for getAllSwitches:
+**Java example for getAllSwitches:**
 
    mySocket.socket.emit("getAllSwitches", new Ack()
    {
@@ -89,7 +94,7 @@ Java example for getAllSwitches:
       }
    });
 
-Java example for getAllUnitsOf (with "LightScene" as argument type):
+**Java example for getAllUnitsOf** (with "LightScene" as argument type):
 
    mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
    {
