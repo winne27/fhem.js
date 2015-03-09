@@ -74,35 +74,34 @@ Javascript example:
         }
     })
 
-   Java example for getAllSwitches:
+Java example for getAllSwitches:
 
-      mySocket.socket.emit("getAllSwitches", new Ack()
+   mySocket.socket.emit("getAllSwitches", new Ack()
+   {
+      @Override
+      public void call(Object... args)
       {
-         @Override
-         public void call(Object... args)
+         JSONArray JSONswitches = (JSONArray) args[0];
+         for (int i = 0, size = JSONswitches.length(); i < size; i++)
          {
-            JSONArray JSONswitches = (JSONArray) args[0];
-            for (int i = 0, size = JSONswitches.length(); i < size; i++)
-            {
-               String device = JSONswitches.getString(i);
-            }
+            String device = JSONswitches.getString(i);
          }
-      });
+      }
+   });
 
-   Java example for getAllUnitsOf (with "LightScene" as argument type):
+Java example for getAllUnitsOf (with "LightScene" as argument type):
 
-      mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
+   mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
+   {
+      @Override
+      public void call(Object... args)
       {
-         @Override
-         public void call(Object... args)
+         JSONArray JSONlightscenes = (JSONArray) args[0];
+         try
          {
-            //JSONObject obj = (JSONObject) args[0];
-            JSONArray JSONlightscenes = (JSONArray) args[0];
-            try
+            for (int i = 0, size = JSONlightscenes.length(); i < size; i++)
             {
-               for (int i = 0, size = JSONlightscenes.length(); i < size; i++)
-               {
-                  String unit = JSONlightscenes.getString(i);
-            }
+               String unit = JSONlightscenes.getString(i);
          }
-      });
+      }
+   });
