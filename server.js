@@ -25,51 +25,87 @@ var ios = io(server);
 // handle for the websocket connection from client
 ios.sockets.on('connection', function(socket)
 {
+      mylog("client connected");
       socket.on('getValueOnce', function(data)
       {
          var jsonValue = buffer.checkValue(data);
          if (jsonValue)
          {
+            //console.log(jsonValue);
             socket.emit('value',jsonValue);
          }
       });
 
-      socket.on('getValuePerm', function(data)
+      socket.on('getValueOnChange', function(data)
       {
-         var jsonValue = buffer.checkValue(data);
-         if (jsonValue)
+         //mylog("getValueOnChange " + data);
+         if(socket.rooms.indexOf(data) < 0)
          {
-            socket.emit('value',jsonValue);
+            socket.join(data);
          }
-         socket.join(data);
       });
 
-      socket.on('command', function(data)
+      socket.on('getAllValues', function(callback)
       {
-         //mylog('command received: ' + data);
+         var response = buffer.checkValue('all');
+         callback(response);
+      });
+
+      socket.on('command', function(cmd,callback)
+      {
+         // establish telnet connection to fhem server
          var fhemcmd = net.connect({port: params.fhemPort}, function()
          {
-            fhemcmd.write(data + '\r\n');
+            fhemcmd.write(cmd + '\r\n');
          });
 
-         fhemcmd.on('data', function(data)
+         fhemcmd.setTimeout(20000);
+         fhemcmd.on('data', function(response)
          {
-            socket.emit('cmd',data);
+            var arrayResp = response.toString().split("\n");
+            callback(arrayResp);
             fhemcmd.end();
+            fhemcmd.destroy();
          });
+      });
+
+      socket.on('allSwitches', function(callback)
+      {
+         //mylog("allSwitches fired by client");
+         var response = buffer.getAllSwitches();
+         callback(response);
+      });
+
+      socket.on('getAllUnitsOf', function(type,callback)
+      {
+         var units = buffer.getAllUnitsOf(type);
+         callback(units);
       });
 
       socket.on('commandNoResp', function(data)
       {
+         console.log("commandNoResp " + data);
+         // establish telnet connection to fhem server
          var fhemcmd = net.connect({port: params.fhemPort}, function()
          {
             fhemcmd.write(data + '\r\n');
          });
-
+         fhemcmd.setTimeout(10000);
          fhemcmd.on('data', function(data)
          {
             fhemcmd.end();
+            fhemcmd.destroy();
+
          });
+      });
+      socket.on('disconnect', function(data)
+      {
+          mylog('disconnected: ' + data);
+          for (room in socket.rooms)
+          {
+             //mylog("leave " + room);
+             socket.leave(room);
+          }
       });
 
 });
@@ -80,7 +116,7 @@ initFinished.on('true',function()
 
    var trigger = net.connect({port: params.fhemPort}, function()
    {
-      funcs.mylog('connected to fhem server for trigger enable');
+      //funcs.mylog('connected to fhem server for trigger enable');
       trigger.write('inform on\r\n');
    });
 
@@ -98,15 +134,17 @@ initFinished.on('true',function()
 
 function getValues(type)
 {
+   // establish telnet connection to fhem server
    var fhemreq = net.connect({port: params.fhemPort}, function()
    {
       fhemreq.write('list\r\n');
    });
-
+   fhemreq.setTimeout(10000);
    fhemreq.on('data', function(data)
    {
       buffer.readValues(ios,type,data);
       fhemreq.end();
+      fhemreq.destroy();
    });
 }
 
