@@ -69,7 +69,7 @@ ios.sockets.on('connection', function(socket)
          });
       });
 
-      socket.on('allSwitches', function(callback)
+      socket.on('getAllSwitches', function(callback)
       {
          //mylog("allSwitches fired by client");
          var response = buffer.getAllSwitches();

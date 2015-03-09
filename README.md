@@ -33,10 +33,13 @@ On client side you need socket.io (tested with diverent browsers and with Androi
 
 On client you can fire the following requests:
 
-  * 'getValueOnce' : requests a value from fhem once
-  * 'getValuePerm' : requests a value from fhem and subscribes delivery of updated values by websockets connection
-  * 'command'      : send a fhem command like "list xyz". Response is send back as ack response
-  * 'commandNoResp': send a fhem command like "set xyz off". No response of this command is send back.
+  * 'getValueOnce'     : requests a value from fhem once
+  * 'getValueOnChange' : subscribes delivery of updated values by a websocket connection
+  * 'command'          : send a fhem command like "list xyz". Response is send back as ack response
+  * 'commandNoResp'    : send a fhem command like "set xyz off". No response of this command is send back
+  * 'getAllSwitches'   : returns JSON array with all devices which have state on, off or toggle
+  * 'getAllValues'     : returns JSON array with all devices and their state
+  * 'getAllUnitsOf'    : returns JSON array with all devices of type, there type is a argument
 
 On client side the following receiving data event should be handled:
 
@@ -71,4 +74,35 @@ Javascript example:
         }
     })
 
+   Java example for getAllSwitches:
 
+      mySocket.socket.emit("getAllSwitches", new Ack()
+      {
+         @Override
+         public void call(Object... args)
+         {
+            JSONArray JSONswitches = (JSONArray) args[0];
+            for (int i = 0, size = JSONswitches.length(); i < size; i++)
+            {
+               String device = JSONswitches.getString(i);
+            }
+         }
+      });
+
+   Java example for getAllUnitsOf (with "LightScene" as argument type):
+
+      mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
+      {
+         @Override
+         public void call(Object... args)
+         {
+            //JSONObject obj = (JSONObject) args[0];
+            JSONArray JSONlightscenes = (JSONArray) args[0];
+            try
+            {
+               for (int i = 0, size = JSONlightscenes.length(); i < size; i++)
+               {
+                  String unit = JSONlightscenes.getString(i);
+            }
+         }
+      });
