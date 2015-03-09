@@ -77,24 +77,24 @@ On client side the following receiving data event should be handled:
         {
            var value = data[unit];
         }
-    })
+    });
 
 **Java example for getAllSwitches:**
 
-   ...    
-   mySocket.socket.emit("getAllSwitches", new Ack()
-   {
-      @Override
-      public void call(Object... args)
-      {
-         JSONArray JSONswitches = (JSONArray) args[0];
-         for (int i = 0, size = JSONswitches.length(); i < size; i++)
-         {
-            String device = JSONswitches.getString(i);
-         }
-      }
-   });
-   ...
+    ...    
+    mySocket.socket.emit("getAllSwitches", new Ack()
+    {
+        @Override
+        public void call(Object... args)
+        {
+            JSONArray JSONswitches = (JSONArray) args[0];
+            for (int i = 0, size = JSONswitches.length(); i < size; i++)
+            {
+                String device = JSONswitches.getString(i);
+            }
+        }
+    });
+    ...
 
 **Java example for getAllUnitsOf** (with "LightScene" as argument type):
 
