@@ -81,7 +81,6 @@ On client side the following receiving data event should be handled:
 
 **Java example for getAllSwitches:**
 
-    ...    
     mySocket.socket.emit("getAllSwitches", new Ack()
     {
         @Override
@@ -94,26 +93,22 @@ On client side the following receiving data event should be handled:
             }
         }
     });
-    ...
 
 **Java example for getAllUnitsOf** (with "LightScene" as argument type):
 
-   ...
-   
-   mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
-   {
-      @Override
-      public void call(Object... args)
-      {
-         JSONArray JSONlightscenes = (JSONArray) args[0];
-         try
-         {
-            for (int i = 0, size = JSONlightscenes.length(); i < size; i++)
+    mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
+    {
+        @Override
+        public void call(Object... args)
+        {
+            JSONArray JSONlightscenes = (JSONArray) args[0];
+            try
             {
-               String unit = JSONlightscenes.getString(i);
-         }
-      }
-   });
-   
-   ...
+                for (int i = 0, size = JSONlightscenes.length(); i < size; i++)
+                {
+                    String unit = JSONlightscenes.getString(i);
+                }
+            }
+        }
+    });
    
