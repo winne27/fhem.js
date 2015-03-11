@@ -27,6 +27,14 @@ The fhem.js server establishes a permanent telnet connection to the standard fhe
 
 Communication to clients with websockets were realized by the socket.io package.
 
+# Customize
+
+Adjust in params.js telnet port of fhem.pl server and port on which this server (fhem.js) is reachable.
+
+The fhem.pl server must be on the same server and the telnet must be configured without local password.
+
+To secure the connection to this node.js server use Apache or nginx proxy.
+
 # Client
 
 On client side you need socket.io (tested with diverent browsers and with Android Java using java class [com.github.nkzawa.socketio.client](https://github.com/nkzawa/socket.io-client.java) for realizing a websocket connection.).
