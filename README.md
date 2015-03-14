@@ -33,7 +33,19 @@ Adjust in params.js telnet port of fhem.pl server and port on which this server 
 
 The fhem.pl server must be on the same server and the telnet must be configured without local password.
 
-To secure the connection to this node.js server use Apache or nginx proxy.
+To secure the connection to this node.js server with SSL set
+
+    exports.useSSL = true;
+    exports.sslcert =
+    {
+        key:    '/etc/ssl/private/bundle/ssl.key',
+        cert:   '/etc/ssl/private/bundle/allcert.pem',
+        ca:     '/etc/ssl/private/client/ca.crt'
+    }
+
+The ca.crt is only needed if you want to authenticate clients by a certificate. Then also set
+
+    exports.useClientAuth = false;
 
 # Client
 
