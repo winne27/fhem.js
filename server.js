@@ -1,4 +1,3 @@
-var http    = require('http');
 var url     = require('url');
 var fs      = require('fs');
 var io      = require('socket.io');
@@ -9,16 +8,59 @@ var buffer  = require('./buffer');
 var events  = require('./events');
 var mylog   = funcs.mylog;
 var initFinished = events.initFinished;
+var server;
 
-// deliver http requests
-var server = http.createServer(function(request, response)
+if (params.useSSL)
 {
-   var path = url.parse(request.url).pathname;
-   var uri = url.parse(request.url);
+   var https    = require('https');
+   var options =
+   {
+      key: fs.readFileSync(params.sslcert.key),
+      cert: fs.readFileSync(params.sslcert.cert)
+   };
 
-         response.writeHead(200, {'Content-Type': 'text/plain'});
+   if (params.useClientAuth)
+   {
+     options.ca = fs.readFileSync(params.sslcert.ca);
+     options.requestCert = true,
+     options.rejectUnauthorized = true
+   }
+   server = https.createServer(options);
+}
+else
+{
+   var http    = require('http');
+   server  = http.createServer();
+}
+
+if (params.pathHTML)
+{
+   mylog('listen for http requests');
+
+   server.on('request',function(request, response)
+   {
+      var path = url.parse(request.url).pathname;
+      if (path === '/' || path === '')
+      {
+         path = '/' + params.indexHTML;
+      }
+      var htppFile = params.pathHTML + path;
+
+      try
+      {
+         var HTML = fs.readFileSync(htppFile);
+         response.writeHead(200, {'Content-Type': 'text/html'});
+         response.write(HTML);
          response.end();
-});
+      }
+      catch(e)
+      {
+         response.writeHead(404);
+         response.write("Requested URL does not exist - 404");
+      }
+   });
+
+}
 
 var ios = io(server);
 
@@ -112,6 +154,7 @@ ios.sockets.on('connection', function(socket)
 
 initFinished.on('true',function()
 {
+   mylog('initFinished');
    server.listen(params.nodePort);
 
    var trigger = net.connect({port: params.fhemPort}, function()
@@ -150,4 +193,5 @@ function getValues(type)
 
 getValues('init');
 
-funcs.mylog('Server startet');
+var messSuff = (params.useSSL) ? 'with SSL' : 'without SSL';
+funcs.mylog('Server started: ' + messSuff);

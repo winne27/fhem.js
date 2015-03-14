@@ -27,7 +27,13 @@ function readValues(ios,type,data)
       };
 
       // ignore telnet infos
-      if (line.substr(0,7) == 'telnet:') {return;};
+      if (line.indexOf('telnet') >= 0) {return;};
+
+      // ignore WebFhem infos
+      if (line.indexOf('WEBFHEM') >= 0) {return;};
+
+      // ignore WebFhem infos
+      if (line.indexOf('FHEMWEB') >= 0) {return;};
 
       // ignore LogFile infos
       if (line.substr(0,7) == 'FileLog') {return;};
