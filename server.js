@@ -16,7 +16,9 @@ if (params.useSSL)
    var options =
    {
       key: fs.readFileSync(params.sslcert.key),
-      cert: fs.readFileSync(params.sslcert.cert)
+      cert: fs.readFileSync(params.sslcert.cert),
+      ciphers: params.cipher,
+      honorCipherOrder: true
    };
 
    if (params.useClientAuth)

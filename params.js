@@ -28,3 +28,4 @@ exports.sslcert =
    cert:   '/etc/ssl/private/bundle/allcert.pem',
    ca:     '/etc/ssl/private/client/ca.crt'
 }
+exports.cipher = 'HIGH:!aNULL:!MD5';
