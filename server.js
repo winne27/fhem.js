@@ -2,6 +2,7 @@ var url     = require('url');
 var fs      = require('fs');
 var io      = require('socket.io');
 var net     = require('net');
+var crypto  = require('crypto');
 var params  = require('./params');
 var funcs   = require('./functions');
 var buffer  = require('./buffer');
@@ -20,13 +21,14 @@ if (params.useSSL)
       ciphers: params.cipher,
       honorCipherOrder: true
    };
-
+   /*
    if (params.useClientAuth)
    {
      options.ca = fs.readFileSync(params.sslcert.ca);
-     options.requestCert = true,
-     options.rejectUnauthorized = true
+     options.requestCert = true;
+     options.rejectUnauthorized = true;
    }
+   */
    server = https.createServer(options);
 }
 else
@@ -66,9 +68,36 @@ if (params.pathHTML)
 
 var ios = io(server);
 
+if (params.useClientPassword)
+{
+   require('socketio-auth')(ios,
+   {
+     authenticate: authenticate,
+     timeout: 2000
+   });
+
+   function authenticate(password, callback)
+   {
+      if (crypto.createHash('sha256').update(password).digest('hex') === params.connectionPassword)
+      {
+         return callback(null, true);
+      }
+      else
+      {
+         return callback(new Error("Invalid connection password"),false);
+      }
+   }
+}
+
 // handle for the websocket connection from client
 ios.sockets.on('connection', function(socket)
 {
+      if (!params.useClientPassword)
+      {
+         mylog("emit authenticated");
+         socket.emit('authenticated');
+      }
+
       mylog("client connected");
       socket.on('getValueOnce', function(data)
       {
@@ -174,8 +203,7 @@ initFinished.on('true',function()
    {
      funcs.mylog('error: telnet connection closed');
    });
-
-})
+});
 
 function getValues(type)
 {

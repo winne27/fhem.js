@@ -1,4 +1,4 @@
-// port on which service is reachable
+// port on which node.js service is reachable
 exports.nodePort = 8086;
 
 // telnet port of FHEM server
@@ -14,11 +14,18 @@ exports.pathHTML = '/var/www/homepage';
 // default html page
 exports.indexHTML = 'index.html';
 
-// use SSL for connection (true/false)
+// use SSL for conversation (true/false)
 exports.useSSL = true;
 
-// use certificate for client authentication (true/false)
-exports.useClientAuth = false;
+// use connection password (true/false)
+// it is recommended to use this only if useSSL is also true
+// else the password is send as plain text
+exports.useClientPassword = true;
+
+// sha-256 hashed password
+// create it on Linux shell with
+// echo -n "mein Passwort" | sha256sum | cut -d' ' -f1
+exports.connectionPassword = 'addb0f5e7826c857d7376d1bd9bc33c0c544790a2eac96144a8af22b1298c940';
 
 // location of SSL and client-auth certificats
 // only used then useSSL and/or useClientAuth set to true
@@ -26,6 +33,5 @@ exports.sslcert =
 {
    key:    '/etc/ssl/private/bundle/ssl.key',
    cert:   '/etc/ssl/private/bundle/allcert.pem',
-   ca:     '/etc/ssl/private/client/ca.crt'
 }
 exports.cipher = 'HIGH:!aNULL:!MD5';
