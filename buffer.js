@@ -79,6 +79,11 @@ function readValues(ios,type,data)
    }
 }
 
+function setActValue(key,value)
+{
+   aktValues[key] = value;
+}
+
 function checkValue(key)
 {  if (key === 'all')
    {
@@ -126,3 +131,4 @@ exports.checkValue = checkValue;
 exports.readValues = readValues;
 exports.getAllSwitches = getAllSwitches;
 exports.getAllUnitsOf = getAllUnitsOf;
+exports.setActValue = setActValue;

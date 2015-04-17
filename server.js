@@ -10,6 +10,7 @@ var events  = require('./events');
 var mylog   = funcs.mylog;
 var initFinished = events.initFinished;
 var server;
+var reconnectInterval;
 
 if (params.useSSL)
 {
@@ -132,13 +133,17 @@ ios.sockets.on('connection', function(socket)
             fhemcmd.write(cmd + '\r\n');
          });
 
-         fhemcmd.setTimeout(20000);
+         fhemcmd.setTimeout(10000);
          fhemcmd.on('data', function(response)
          {
             var arrayResp = response.toString().split("\n");
             callback(arrayResp);
             fhemcmd.end();
             fhemcmd.destroy();
+         });
+         fhemcmd.on('error', function()
+         {
+            funcs.mylog('error: telnet connection failed');
          });
       });
 
@@ -157,7 +162,7 @@ ios.sockets.on('connection', function(socket)
 
       socket.on('commandNoResp', function(data)
       {
-         console.log("commandNoResp " + data);
+         //console.log("commandNoResp " + data);
          // establish telnet connection to fhem server
          var fhemcmd = net.connect({port: params.fhemPort}, function()
          {
@@ -169,6 +174,11 @@ ios.sockets.on('connection', function(socket)
             fhemcmd.end();
             fhemcmd.destroy();
 
+         });
+         fhemcmd.on('error', function()
+         {
+            funcs.mylog('error: telnet connection failed');
+            socket.emit('fhemError');
          });
       });
       socket.on('disconnect', function(data)
@@ -187,23 +197,45 @@ initFinished.on('true',function()
 {
    mylog('initFinished');
    server.listen(params.nodePort);
+   connectFHEMserver();
+});
 
+function connectFHEMserver()
+{
+   funcs.mylog("start connection to fhem server");
    var trigger = net.connect({port: params.fhemPort}, function()
    {
-      //funcs.mylog('connected to fhem server for trigger enable');
+      funcs.mylog('connected to fhem server for trigger enable');
       trigger.write('inform on\r\n');
+      ios.sockets.emit('fhemConn');
    });
 
    trigger.on('data', function(data)
    {
-      getValues('update');
+      //console.log(data.toString());
+
+      clearInterval(reconnectInterval);
+      checkValues(data.toString().split("\n"));
+   });
+
+   trigger.on('error', function()
+   {
+      funcs.mylog('error: telnet connection failed - retry in 10 secs');
+      reconnectInterval = setTimeout(function ()
+      {
+         connectFHEMserver();
+      }, 10000);
    });
 
    trigger.on('end', function()
    {
-     funcs.mylog('error: telnet connection closed');
+      funcs.mylog('error: telnet connection closed - try restart in 10 secs');
+      reconnectInterval = setTimeout(function ()
+      {
+         connectFHEMserver();
+      },105000);
    });
-});
+}
 
 function getValues(type)
 {
@@ -212,13 +244,61 @@ function getValues(type)
    {
       fhemreq.write('list\r\n');
    });
-   fhemreq.setTimeout(10000);
+   //fhemreq.setTimeout(10000);
+
    fhemreq.on('data', function(data)
    {
       buffer.readValues(ios,type,data);
       fhemreq.end();
       fhemreq.destroy();
    });
+
+   fhemreq.on('error', function()
+   {
+      funcs.mylog('error: telnet connection for getting values failed - retry in 10 secs');
+      setTimeout(function ()
+      {
+         getValues(type);
+      }, 10000);
+   });
+
+}
+
+function checkValues(allLines)
+{
+   var lastDevice = '';
+   var doGetValues = false;
+   var foundSingleEntity = true;
+
+   allLines.forEach(function (line)
+   {
+      line = line.trim().split(' ');
+      var device = line[1];
+      if (lastDevice !== device)
+      {
+         lastDevice = device;
+         if (!foundSingleEntity)
+         {
+            doGetValues = true;
+         }
+         foundSingleEntity = false;
+      }
+      if (line.length === 3 && line[2].substr(0,4) !== 'set_')
+      {
+         buffer.setActValue(device,line[2]);
+         var jsonValue = buffer.checkValue(device);
+         foundSingleEntity = true;
+         //console.log(jsonValue);
+         ios.sockets.in('all').emit('value',jsonValue);
+         ios.sockets.in(device).emit('value',jsonValue);
+         //console.log(line);
+      }
+   });
+
+   if (doGetValues)
+   {
+      getValues('update');
+   }
 }
 
 getValues('init');
