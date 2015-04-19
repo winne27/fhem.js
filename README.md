@@ -56,23 +56,20 @@ Establish connection to node.js server by:
      socket = IO.socket(url, options);        
      socket.connect();
 
-On client you can fire the following requests:
+**On client you can emit the following async requests:**
 
   * 'getValueOnce'     : requests a value from fhem once
   * 'getValueOnChange' : subscribes delivery of updated values by a websocket connection
-  * 'command'          : send a fhem command like "list xyz". Response is send back as ack response
-  * 'commandNoResp'    : send a fhem command like "set xyz off". No response of this command is send back
-  * 'getAllSwitches'   : returns JSON array with all devices which have state on, off or toggle
-  * 'getAllValues'     : returns JSON array with all devices and their state
-  * 'getAllUnitsOf'    : returns JSON array with all devices of type, there type is a argument
 
-On client side the following receiving data event should be handled:
+Example:
 
-    socket.on('value',....) 
+    socket.emit('getValueOnChange','fhem-device-name'); 
+
+For catching the response define a listener.
 
 **Java example:**
 
-    mySocket.socket.on("value", new Emitter.Listener()
+    socket.on("value", new Emitter.Listener()
     {
         @Override
         public void call(Object... args)
@@ -98,6 +95,13 @@ On client side the following receiving data event should be handled:
            var value = data[unit];
         }
     });
+
+**On client you can emit the following sync requests:**
+  * 'command'          : send a fhem command like "list xyz". Response is send back as ack response
+  * 'commandNoResp'    : send a fhem command like "set xyz off". No response of this command is send back
+  * 'getAllSwitches'   : returns JSON array with all devices which have state on, off or toggle
+  * 'getAllValues'     : returns JSON array with all devices and their state
+  * 'getAllUnitsOf'    : returns JSON array with all devices of type, there type is a argument
 
 **Java example for getAllSwitches:**
 
@@ -132,3 +136,12 @@ On client side the following receiving data event should be handled:
         }
     });
    
+   **Javascript example:**
+
+    socket.emit("getAllUnitsOf", "LightScene", function(data)
+    {
+        for (unit in data)
+        {
+           var value = data[unit];
+        }
+    });
