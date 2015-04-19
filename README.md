@@ -67,7 +67,7 @@ Example:
 
 For catching the response define a listener.
 
-**Java example:**
+Java example:
 
     socket.on("value", new Emitter.Listener()
     {
@@ -86,7 +86,7 @@ For catching the response define a listener.
         }
     }
       
-**Javascript example:**
+Javascript example:
 
     socket.on('value',function(data)
     {
@@ -103,7 +103,7 @@ For catching the response define a listener.
   * 'getAllValues'     : returns JSON array with all devices and their state
   * 'getAllUnitsOf'    : returns JSON array with all devices of type, there type is a argument
 
-**Java example for getAllSwitches:**
+Java example for getAllSwitches:
 
     mySocket.socket.emit("getAllSwitches", new Ack()
     {
@@ -118,7 +118,7 @@ For catching the response define a listener.
         }
     });
 
-**Java example for getAllUnitsOf** (with "LightScene" as argument type):
+Java example for getAllUnitsOf (with "LightScene" as argument type):
 
     mySocket.socket.emit("getAllUnitsOf", "LightScene", new Ack()
     {
@@ -136,7 +136,7 @@ For catching the response define a listener.
         }
     });
    
-   **Javascript example:**
+   Javascript example:
 
     socket.emit("getAllUnitsOf", "LightScene", function(data)
     {
