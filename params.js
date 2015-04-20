@@ -35,3 +35,16 @@ exports.sslcert =
    cert:   '/etc/ssl/private/bundle/allcert.pem',
 }
 exports.cipher = 'HIGH:!aNULL:!MD5';
+
+exports.readDB = true;
+
+// in /etc/fhem (default) must exist files named pw_host_user containing password for mysql connection
+// every possible combination of host and user from readDBvalues below requires an password file
+exports.pwdir = '/etc/fhem';
+
+exports.readDBvalues =
+[
+   {table: 'wetterstation.weather', column: 'wind_gust', sort: 'datetime', fhem_name: 'windspeed', refresh: 60, host: 'localhost', user: 'fhem' }
+]
+
+

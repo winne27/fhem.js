@@ -119,6 +119,15 @@ ios.sockets.on('connection', function(socket)
          }
       });
 
+      socket.on('getAllValuesOnChange', function(data)
+      {
+         //mylog("getValueOnChange " + data);
+         if(socket.rooms.indexOf(data) < 0)
+         {
+            socket.join('all');
+         }
+      });
+
       socket.on('getAllValues', function(callback)
       {
          var response = buffer.checkValue('all');
@@ -288,7 +297,6 @@ function checkValues(allLines)
          buffer.setActValue(device,line[2]);
          var jsonValue = buffer.checkValue(device);
          foundSingleEntity = true;
-         //console.log(jsonValue);
          ios.sockets.in('all').emit('value',jsonValue);
          ios.sockets.in(device).emit('value',jsonValue);
          //console.log(line);
@@ -302,6 +310,19 @@ function checkValues(allLines)
 }
 
 getValues('init');
+
+if (params.readDB)
+{
+   var readdb = require('./readdb');
+   for (var i in params.readDBvalues)
+   {
+      var dbObj = params.readDBvalues[i];
+      setInterval(function()
+      {
+         readdb.getDBvalue(dbObj,net);
+      }, dbObj.refresh * 1000);
+   }
+}
 
 var messSuff = (params.useSSL) ? 'with SSL' : 'without SSL';
 funcs.mylog('Server started: ' + messSuff);
