@@ -58,8 +58,9 @@ Establish connection to node.js server by:
 
 **On client you can emit the following async requests:**
 
-  * 'getValueOnce'     : requests a value from fhem once
-  * 'getValueOnChange' : subscribes delivery of updated values by a websocket connection
+  * 'getValueOnce'         : requests a value from fhem once
+  * 'getValueOnChange'     : subscribes delivery of a single updated value by a websocket connection
+  * 'getAllValuesOnChange' : subscribes delivery of all updated values by a websocket connection
 
 Example:
 
