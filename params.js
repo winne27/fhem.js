@@ -1,3 +1,5 @@
+// set debugging (0,1,2)
+exports.debug = 1;
 // port on which node.js service is reachable
 exports.nodePort = 8086;
 
@@ -36,15 +38,18 @@ exports.sslcert =
 }
 exports.cipher = 'HIGH:!aNULL:!MD5';
 
+
+// use this application for providing mySql values to fhem
 exports.readDB = true;
 
-// in /etc/fhem (default) must exist files named pw_host_user containing password for mysql connection
-// every possible combination of host and user from readDBvalues below requires an password file
+// in /etc/fhem (default) must exist a file named pw_host_user containing password for mysql connection
+// every possible combination of host and user from readDBvalues below requires a password file
 exports.pwdir = '/etc/fhem';
+
 
 exports.readDBvalues =
 [
    {table: 'wetterstation.weather', column: 'wind_gust', sort: 'datetime', fhem_name: 'windspeed', refresh: 60, host: 'localhost', user: 'fhem' }
-]
+];
 
 

@@ -1,3 +1,4 @@
+var params  = require('./params');
 // Datumsberechnungen
 var getToday =
 {
@@ -15,9 +16,13 @@ var getToday =
    },
 };
 
-exports.mylog = function(msg)
+exports.mylog = function(msg,level)
 {
-   console.log(getToday.myHumanReadable() + msg);
+   if (typeof(level) === 'undefined') level = 0;
+   if (level <= params.debug)
+   {
+      console.log(getToday.myHumanReadable() + msg);
+   }
 }
 
 function pad(number, length)

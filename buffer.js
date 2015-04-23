@@ -1,4 +1,6 @@
 var events  = require('./events');
+var funcs   = require('./functions');
+var mylog = funcs.mylog;
 var initFinished = events.initFinished;
 var aktValues = {};
 var aktTypes = {};
@@ -60,7 +62,8 @@ function readValues(ios,type,data)
       aktValues = JSON.parse(JSON.stringify(newValues));
       aktTypes = JSON.parse(JSON.stringify(newTypes));
       initFinished.emit('true');
-      //console.log(aktValues);
+      mylog("aktValues:",2);
+      mylog(aktValues,2);
    }
    else
    {
@@ -71,7 +74,7 @@ function readValues(ios,type,data)
             aktValues[key] = newValues[key];
             aktTypes[key] = newTypes[key];
             var jsonValue = checkValue(key);
-            //console.log(jsonValue);
+            mylog(jsonValue,2);
             ios.sockets.in('all').emit('value',jsonValue);
             ios.sockets.in(key).emit('value',jsonValue);
          }

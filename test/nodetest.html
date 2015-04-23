@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+   var socket = io.connect('https://your-domain.tld:8086');
+
+   socket.emit('getAllValues', function(data)
+   {
+      var out = '';
+      for (unit in data)
+      {
+         var value = data[unit];
+         out = out + unit + ': ' + value + "<br>";
+      }
+      document.getElementById("container").innerHTML = out;
+   });
+</script>
+</head>
+
+<body>
+   <div id="container">empty</div>
+</body>
+</html>

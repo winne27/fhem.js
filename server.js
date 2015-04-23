@@ -3,12 +3,14 @@ var fs      = require('fs');
 var io      = require('socket.io');
 var net     = require('net');
 var crypto  = require('crypto');
+var auth    = require('socketio-auth');
+var events  = require('events');
 var params  = require('./params');
 var funcs   = require('./functions');
 var buffer  = require('./buffer');
-var events  = require('./events');
+var eventsG = require('./events');
 var mylog   = funcs.mylog;
-var initFinished = events.initFinished;
+var initFinished = eventsG.initFinished;
 var server;
 var reconnectInterval;
 
@@ -22,14 +24,6 @@ if (params.useSSL)
       ciphers: params.cipher,
       honorCipherOrder: true
    };
-   /*
-   if (params.useClientAuth)
-   {
-     options.ca = fs.readFileSync(params.sslcert.ca);
-     options.requestCert = true;
-     options.rejectUnauthorized = true;
-   }
-   */
    server = https.createServer(options);
 }
 else
@@ -40,11 +34,12 @@ else
 
 if (params.pathHTML)
 {
-   mylog('listen for http requests');
+   mylog('listen for http requests',0);
 
    server.on('request',function(request, response)
    {
       var path = url.parse(request.url).pathname;
+      mylog('http request: ' + path,1);
       if (path === '/' || path === '')
       {
          path = '/' + params.indexHTML;
@@ -71,165 +66,185 @@ var ios = io(server);
 
 if (params.useClientPassword)
 {
-   require('socketio-auth')(ios,
+   auth(ios,
    {
-     authenticate: authenticate,
-     timeout: 2000
+      authenticate:    function (password, callback)
+      {
+         mylog("authentication by client",1);
+         if (crypto.createHash('sha256').update(password).digest('hex') === params.connectionPassword)
+         {
+            mylog("authentication success",1);
+            return callback(null, true);
+         }
+         else
+         {
+            mylog("authentication failed",0);
+            return callback(new Error("Invalid connection password"),false);
+         }
+      },
+      timeout: 1000
    });
-
-   function authenticate(password, callback)
-   {
-      if (crypto.createHash('sha256').update(password).digest('hex') === params.connectionPassword)
-      {
-         return callback(null, true);
-      }
-      else
-      {
-         return callback(new Error("Invalid connection password"),false);
-      }
-   }
 }
 
 // handle for the websocket connection from client
 ios.sockets.on('connection', function(socket)
 {
-      if (!params.useClientPassword)
+/*   socket.emit('connected');
+   var waitAuth = setTimeout(function ()
+   {
+      defListeners(socket);
+   }, 3000);*/
+   //emit authenticated if no passwd is used
+
+   if (!params.useClientPassword)
+   {
+      mylog("emit authenticated",1);
+      //clearTimeout(waitAuth);
+      socket.emit('authenticated');
+   }
+   else
+   {
+      //clearTimeout(waitAuth);
+   }
+   defListeners(socket);
+});
+
+var defListeners = function(socket)
+{
+   mylog("client connected",0);
+   socket.on('getValueOnce', function(data)
+   {
+      var jsonValue = buffer.checkValue(data);
+      if (jsonValue)
       {
-         mylog("emit authenticated");
-         socket.emit('authenticated');
+         mylog('get value for ' + data,2);
+         mylog(jsonValue,2);
+         socket.emit('value',jsonValue);
       }
+   });
 
-      mylog("client connected");
-      socket.on('getValueOnce', function(data)
+   socket.on('getValueOnChange', function(data)
+   {
+      mylog("request for getValueOnChange " + data,1);
+      if(socket.rooms.indexOf(data) < 0)
       {
-         var jsonValue = buffer.checkValue(data);
-         if (jsonValue)
-         {
-            //console.log(jsonValue);
-            socket.emit('value',jsonValue);
-         }
-      });
+         socket.join(data);
+      }
+   });
 
-      socket.on('getValueOnChange', function(data)
+   socket.on('getAllValuesOnChange', function(data)
+   {
+      mylog("request for getAllValuesOnChange",1);
+      if(socket.rooms.indexOf('all') < 0)
       {
-         //mylog("getValueOnChange " + data);
-         if(socket.rooms.indexOf(data) < 0)
-         {
-            socket.join(data);
-         }
-      });
+         socket.join('all');
+      }
+   });
 
-      socket.on('getAllValuesOnChange', function(data)
-      {
-         //mylog("getValueOnChange " + data);
-         if(socket.rooms.indexOf(data) < 0)
-         {
-            socket.join('all');
-         }
-      });
-
-      socket.on('getAllValues', function(callback)
+   socket.on('getAllValues', function(callback)
+   {
+      mylog("request for getAllValues",1);
+      if (!params.useClientPassword || socket.auth)
       {
          var response = buffer.checkValue('all');
          callback(response);
-      });
-
-      socket.on('command', function(cmd,callback)
+      }
+      else
       {
-         // establish telnet connection to fhem server
-         var fhemcmd = net.connect({port: params.fhemPort}, function()
-         {
-            fhemcmd.write(cmd + '\r\n');
-         });
+         callback({error: 'not authenticated'});
+      }
+   });
 
-         fhemcmd.setTimeout(10000);
-         fhemcmd.on('data', function(response)
-         {
-            var arrayResp = response.toString().split("\n");
-            callback(arrayResp);
-            fhemcmd.end();
-            fhemcmd.destroy();
-         });
-         fhemcmd.on('error', function()
-         {
-            funcs.mylog('error: telnet connection failed');
-         });
-      });
-
-      socket.on('getAllSwitches', function(callback)
+   socket.on('command', function(cmd,callback)
+   {
+      // establish telnet connection to fhem server
+      var fhemcmd = net.connect({port: params.fhemPort}, function()
       {
-         //mylog("allSwitches fired by client");
-         var response = buffer.getAllSwitches();
-         callback(response);
+          fhemcmd.write(cmd + '\r\n');
       });
 
-      socket.on('getAllUnitsOf', function(type,callback)
+      fhemcmd.setTimeout(10000);
+      fhemcmd.on('data', function(response)
       {
-         var units = buffer.getAllUnitsOf(type);
-         callback(units);
+         var arrayResp = response.toString().split("\n");
+         callback(arrayResp);
+         fhemcmd.end();
+         fhemcmd.destroy();
       });
-
-      socket.on('commandNoResp', function(data)
+      fhemcmd.on('error', function()
       {
-         //console.log("commandNoResp " + data);
-         // establish telnet connection to fhem server
-         var fhemcmd = net.connect({port: params.fhemPort}, function()
-         {
-            fhemcmd.write(data + '\r\n');
-         });
-         fhemcmd.setTimeout(10000);
-         fhemcmd.on('data', function(data)
-         {
-            fhemcmd.end();
-            fhemcmd.destroy();
-
-         });
-         fhemcmd.on('error', function()
-         {
-            funcs.mylog('error: telnet connection failed');
-            socket.emit('fhemError');
-         });
+         funcs.mylog('error: telnet connection failed',0);
       });
-      socket.on('disconnect', function(data)
+   });
+
+   socket.on('getAllSwitches', function(callback)
+   {
+      mylog("allSwitches fired by client",1);
+      var response = buffer.getAllSwitches();
+      callback(response);
+   });
+
+   socket.on('getAllUnitsOf', function(type,callback)
+   {
+      var units = buffer.getAllUnitsOf(type);
+      callback(units);
+   });
+
+   socket.on('commandNoResp', function(data)
+   {
+      mylog("commandNoResp " + data,1);
+      // establish telnet connection to fhem server
+      var fhemcmd = net.connect({port: params.fhemPort}, function()
       {
-          mylog('disconnected: ' + data);
-          for (room in socket.rooms)
-          {
-             //mylog("leave " + room);
-             socket.leave(room);
-          }
+         fhemcmd.write(data + '\r\n');
+         fhemcmd.end();
+         fhemcmd.destroy();
       });
-
-});
+      fhemcmd.on('error', function()
+      {
+         funcs.mylog('error: telnet connection failed',0);
+         socket.emit('fhemError');
+      });
+   });
+   socket.on('disconnect', function(data)
+   {
+       mylog('disconnected: ' + data);
+       for (room in socket.rooms)
+       {
+          mylog("leave " + room,1);
+          socket.leave(room);
+       }
+   });
+};
 
 initFinished.on('true',function()
 {
-   mylog('initFinished');
+   mylog('initFinished',1);
    server.listen(params.nodePort);
    connectFHEMserver();
 });
 
 function connectFHEMserver()
 {
-   funcs.mylog("start connection to fhem server");
+   funcs.mylog("start connection to fhem server",0);
    var trigger = net.connect({port: params.fhemPort}, function()
    {
-      funcs.mylog('connected to fhem server for trigger enable');
+      funcs.mylog('connected to fhem server for listen on changed values',0);
       trigger.write('inform on\r\n');
       ios.sockets.emit('fhemConn');
    });
 
    trigger.on('data', function(data)
    {
-      //console.log(data.toString());
-
+      mylog("changed data:",2);
+      mylog(data.toString(),2);
       clearInterval(reconnectInterval);
       checkValues(data.toString().split("\n"));
    });
 
    trigger.on('error', function()
    {
-      funcs.mylog('error: telnet connection failed - retry in 10 secs');
+      mylog('error: telnet connection failed - retry in 10 secs',0);
       reconnectInterval = setTimeout(function ()
       {
          connectFHEMserver();
@@ -238,11 +253,11 @@ function connectFHEMserver()
 
    trigger.on('end', function()
    {
-      funcs.mylog('error: telnet connection closed - try restart in 10 secs');
+      funcs.mylog('error: telnet connection closed - try restart in 10 secs',0);
       reconnectInterval = setTimeout(function ()
       {
          connectFHEMserver();
-      },105000);
+      },10000);
    });
 }
 
@@ -253,7 +268,6 @@ function getValues(type)
    {
       fhemreq.write('list\r\n');
    });
-   //fhemreq.setTimeout(10000);
 
    fhemreq.on('data', function(data)
    {
@@ -264,7 +278,7 @@ function getValues(type)
 
    fhemreq.on('error', function()
    {
-      funcs.mylog('error: telnet connection for getting values failed - retry in 10 secs');
+      mylog('error: telnet connection for getting values failed - retry in 10 secs',0);
       setTimeout(function ()
       {
          getValues(type);
@@ -299,7 +313,6 @@ function checkValues(allLines)
          foundSingleEntity = true;
          ios.sockets.in('all').emit('value',jsonValue);
          ios.sockets.in(device).emit('value',jsonValue);
-         //console.log(line);
       }
    });
 
@@ -325,4 +338,5 @@ if (params.readDB)
 }
 
 var messSuff = (params.useSSL) ? 'with SSL' : 'without SSL';
-funcs.mylog('Server started: ' + messSuff);
+
+mylog('Server started: ' + messSuff,0);

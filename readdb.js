@@ -1,6 +1,8 @@
-var params  = require('./params');
 var mysql   = require('mysql');
 var fs      = require('fs');
+var params  = require('./params');
+var funcs   = require('./functions');
+var mylog   = funcs.mylog;
 var pw      = {};
 
 function getDBvalue(dbObj,net)
@@ -27,17 +29,13 @@ function getDBvalue(dbObj,net)
          var fhemcmd = net.connect({port: params.fhemPort}, function()
          {
             fhemcmd.write('set ' + dbObj.fhem_name + ' ' + value + '\r\n');
-         });
-         fhemcmd.setTimeout(10000);
-         fhemcmd.on('data', function(data)
-         {
             fhemcmd.end();
             fhemcmd.destroy();
          });
       }
       else
       {
-         console.log('Error while performing Query.');
+         mylog('Error while performing Query.',0);
       }
       connection.end();
    });
