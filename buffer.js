@@ -54,7 +54,7 @@ function readValues(ios,type,data)
       var key = parts[0].trim();
 
       // ignore set status
-      if (parts[2].substr(0,4) == 'set_') {return;};
+      if (typeof parts[2] === "undefined" || parts[2].substr(0,4) == 'set_') {return};
 
       newValues[key] = parts[2];
       newTypes[key] = lastHeader;
