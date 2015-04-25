@@ -300,12 +300,18 @@ function getValues(type)
    // establish telnet connection to fhem server
    var fhemreq = net.connect({port: params.fhemPort}, function()
    {
-      fhemreq.write('list\r\n');
+      fhemreq.write('list;exit\r\n');
    });
 
-   fhemreq.on('data', function(data)
+   var answerStr = '';
+   fhemreq.on('data', function(response)
    {
-      buffer.readValues(ios,type,data);
+      answerStr += response.toString();
+   });
+
+   fhemreq.on('end', function()
+   {
+      buffer.readValues(ios,type,answerStr);
       fhemreq.end();
       fhemreq.destroy();
    });
