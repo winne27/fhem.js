@@ -213,7 +213,7 @@ var defListeners = function(socket)
       fhemcmd.on('end', function()
       {
          var answer = JSON.parse(answerStr);
-         console.log(answer);
+         mylog(answer,2);
          callback(answer);
          fhemcmd.end();
          fhemcmd.destroy();
