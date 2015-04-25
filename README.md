@@ -39,13 +39,8 @@ To secure the connection to this node.js server with SSL set
     exports.sslcert =
     {
         key:    '/etc/ssl/private/bundle/ssl.key',
-        cert:   '/etc/ssl/private/bundle/allcert.pem',
-        ca:     '/etc/ssl/private/client/ca.crt'
+        cert:   '/etc/ssl/private/bundle/allcert.pem'
     }
-
-The ca.crt is only needed if you want to authenticate clients by a certificate. Then also set
-
-    exports.useClientAuth = false;
 
 # Client
 
