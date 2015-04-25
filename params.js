@@ -6,6 +6,7 @@ exports.nodePort = 8086;
 // telnet port of FHEM server
 exports.fhemPort = 7072;
 
+// webserver root directory:
 // path for Webfiles (html,css,js, ...) !! no php !!
 // change to path of web directory only if you want to deliver
 // web files by this server
@@ -22,7 +23,7 @@ exports.useSSL = true;
 // use connection password (true/false)
 // it is recommended to use this only if useSSL is also true
 // else the password is send as plain text
-exports.useClientPassword = true;
+exports.useClientPassword = false;
 
 // sha-256 hashed password
 // create it on Linux shell with

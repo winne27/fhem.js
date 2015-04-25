@@ -3,7 +3,6 @@ var fs      = require('fs');
 var io      = require('socket.io');
 var net     = require('net');
 var crypto  = require('crypto');
-var auth    = require('socketio-auth');
 var events  = require('events');
 var params  = require('./params');
 var funcs   = require('./functions');
@@ -66,6 +65,7 @@ var ios = io(server);
 
 if (params.useClientPassword)
 {
+   var auth = require('socketio-auth'); 
    auth(ios,
    {
       authenticate:    function (password, callback)
@@ -160,13 +160,18 @@ var defListeners = function(socket)
       // establish telnet connection to fhem server
       var fhemcmd = net.connect({port: params.fhemPort}, function()
       {
-          fhemcmd.write(cmd + '\r\n');
+          fhemcmd.write(cmd + ';exit\r\n');
       });
 
-      fhemcmd.setTimeout(10000);
+      var answerStr = '';
       fhemcmd.on('data', function(response)
       {
-         var arrayResp = response.toString().split("\n");
+         answerStr += response.toString();
+      });
+
+      fhemcmd.on('end', function()
+      {
+         var arrayResp = answerStr.split("\n");
          callback(arrayResp);
          fhemcmd.end();
          fhemcmd.destroy();
@@ -188,6 +193,35 @@ var defListeners = function(socket)
    {
       var units = buffer.getAllUnitsOf(type);
       callback(units);
+   });
+
+   socket.on('JsonList2', function(args,callback)
+   {
+      // establish telnet connection to fhem server
+      mylog("request for JsonList2",1);
+      var fhemcmd = net.connect({port: params.fhemPort}, function()
+      {
+          fhemcmd.write('JsonList2 ' + args + ';exit\r\n');
+      });
+
+      var answerStr = '';
+      fhemcmd.on('data', function(response)
+      {
+         answerStr += response.toString().replace("\n","");
+      });
+
+      fhemcmd.on('end', function()
+      {
+         var answer = JSON.parse(answerStr);
+         console.log(answer);
+         callback(answer);
+         fhemcmd.end();
+         fhemcmd.destroy();
+      });
+      fhemcmd.on('error', function()
+      {
+         funcs.mylog('error: telnet connection failed',0);
+      });
    });
 
    socket.on('commandNoResp', function(data)
