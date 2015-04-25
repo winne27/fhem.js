@@ -98,11 +98,12 @@ Javascript example:
     });
 
 **On client you can emit the following sync requests:**
-  * 'command'          : send a fhem command like "list xyz". Response is send back as ack response
-  * 'commandNoResp'    : send a fhem command like "set xyz off". No response of this command is send back
+  * 'command',cmd      : send a fhem command like "list xyz". Response is send back as ack response
+  * 'commandNoResp',cmd: send a fhem command like "set xyz off". No response of this command is send back
   * 'getAllSwitches'   : returns JSON array with all devices which have state on, off or toggle
   * 'getAllValues'     : returns JSON array with all devices and their state
   * 'getAllUnitsOf'    : returns JSON array with all devices of type, there type is a argument
+  * 'JsonList2',cmd    : returns response from JsonList2 as JSON object     
 
 Java example for getAllSwitches:
 
@@ -146,3 +147,15 @@ Java example for getAllUnitsOf (with "LightScene" as argument type):
            var value = data[unit];
         }
     });
+
+# Example
+
+The folder "test" contains a html/javascript example for an client program.
+
+# Start as service
+
+For starting fhem.js as service using forever is recommended. Install it with:
+
+    npm install -g forever
+
+In the folder /etc/init.d is an example for a start/stop script using forever.
