@@ -154,7 +154,7 @@ The folder "test" contains a html/javascript example for an client program.
 
 # Start as service
 
-For starting fhem.js as service using forever is recommended. Install it with:
+For starting fhem.js server as service using forever is recommended. Install it with:
 
     npm install -g forever
 
