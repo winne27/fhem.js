@@ -54,9 +54,6 @@ function readValues(ios,type,data)
       var parts = line.split(/(\(|\))/g);
       var key = parts[0].trim();
 
-      // ignore set status
-      if (typeof parts[2] === "undefined" || parts[2].substr(0,4) == 'set_') {return};
-
       newValues[key] = parts[2];
       newTypes[key] = lastHeader;
    });
@@ -79,7 +76,7 @@ function readValues(ios,type,data)
             aktTypes[key] = newTypes[key];
             var jsonValue = checkValue(key);
             mylog("JSONvalue: " + JSON.stringify(jsonValue),2);
-            ios.sockets.in('all').emit('value',jsonValue);
+            ios.sockets.in("all").emit('value',jsonValue);
             ios.sockets.in(key).emit('value',jsonValue);
          }
       }
@@ -134,6 +131,7 @@ function getAllUnitsOf(type)
    }
    return units;
 }
+
 exports.checkValue = checkValue;
 exports.readValues = readValues;
 exports.getAllSwitches = getAllSwitches;

@@ -347,7 +347,7 @@ function checkValues(allLines)
          }
          foundSingleEntity = false;
       }
-      if (line.length === 3 && line[2].substr(0,4) !== 'set_')
+      if (line.length === 3)
       {
          buffer.setActValue(device,line[2]);
          var jsonValue = buffer.checkValue(device);
