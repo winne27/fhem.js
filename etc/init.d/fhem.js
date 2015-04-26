@@ -1,11 +1,15 @@
 #!/bin/bash
 #
+### BEGIN INIT INFO
+# Provides: fhem.js
 # description:  fhem.js init.d example using forever (install with: npm install -g forever)
-# Required-Start: $fhem.pl
-# Required-Stop: 
+# Required-Start: $local_fs $remote_fs $network $syslog mysql fhem
+# Required-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 #
+### END INIT INFO
+
 
 # Source function library.
 

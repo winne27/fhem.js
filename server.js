@@ -65,13 +65,15 @@ var ios = io(server);
 
 if (params.useClientPassword)
 {
-   var auth = require('socketio-auth'); 
+   var auth = require('socketio-auth');
    auth(ios,
    {
       authenticate:    function (password, callback)
       {
          mylog("authentication by client",1);
-         if (crypto.createHash('sha256').update(password).digest('hex') === params.connectionPassword)
+         var connectionPassword = fs.readFileSync(params.connectionPasswordFile).toString().substr(0,64);
+         //connectionPassword = connectionPassword;
+         if (crypto.createHash('sha256').update(password).digest('hex') === connectionPassword)
          {
             mylog("authentication success",1);
             return callback(null, true);

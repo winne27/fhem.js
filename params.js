@@ -23,12 +23,12 @@ exports.useSSL = true;
 // use connection password (true/false)
 // it is recommended to use this only if useSSL is also true
 // else the password is send as plain text
-exports.useClientPassword = false;
+exports.useClientPassword = true;
 
-// sha-256 hashed password
+// location of sha-256 hashed password
 // create it on Linux shell with
 // echo -n "mein Passwort" | sha256sum | cut -d' ' -f1
-exports.connectionPassword = 'addb0f5e7826c857d7376d1bd9bc33c0c544790a2eac96144a8af22b1298c940';
+exports.connectionPasswordFile = '/etc/fhem/pw_client_auth';
 
 // location of SSL and client-auth certificats
 // only used then useSSL and/or useClientAuth set to true
