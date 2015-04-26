@@ -43,6 +43,9 @@ function readValues(ios,type,data)
       // ignore unpeered values
       if (line.indexOf('unpeered') > 0) {return;};
 
+      // ignore Bye, last line infos
+      if (line.indexOf('Bye...') >= 0) {return;};
+
       //ignore first line
       ln++;
       if (ln == 1) {return};
@@ -51,7 +54,7 @@ function readValues(ios,type,data)
       var key = parts[0].trim();
 
       // ignore set status
-      if (parts[2].substr(0,4) == 'set_') {return;};
+      if (typeof parts[2] === "undefined" || parts[2].substr(0,4) == 'set_') {return};
 
       newValues[key] = parts[2];
       newTypes[key] = lastHeader;
@@ -63,7 +66,7 @@ function readValues(ios,type,data)
       aktTypes = JSON.parse(JSON.stringify(newTypes));
       initFinished.emit('true');
       mylog("aktValues:",2);
-      mylog(aktValues,2);
+      mylog(JSON.stringify(aktValues),2);
    }
    else
    {
@@ -74,7 +77,7 @@ function readValues(ios,type,data)
             aktValues[key] = newValues[key];
             aktTypes[key] = newTypes[key];
             var jsonValue = checkValue(key);
-            mylog(jsonValue,2);
+            mylog("JSONvalue: " + JSON.stringify(jsonValue),2);
             ios.sockets.in('all').emit('value',jsonValue);
             ios.sockets.in(key).emit('value',jsonValue);
          }
