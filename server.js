@@ -240,6 +240,7 @@ var defListeners = function(socket)
          socket.emit('fhemError');
       });
    });
+
    socket.on('disconnect', function(data)
    {
        mylog('disconnected: ' + data);

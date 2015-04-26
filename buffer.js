@@ -45,6 +45,7 @@ function readValues(ios,type,data)
 
       // ignore Bye, last line infos
       if (line.indexOf('Bye...') >= 0) {return;};
+      if (line.indexOf('Connection closed by') >= 0) {return;};
 
       //ignore first line
       ln++;
