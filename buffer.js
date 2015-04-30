@@ -5,7 +5,7 @@ var initFinished = events.initFinished;
 var aktValues = {};
 var aktTypes = {};
 
-function readValues(ios,type,data)
+function readValues(data)
 {
    var newValues = {};
    var newTypes = {};
@@ -58,29 +58,11 @@ function readValues(ios,type,data)
       newTypes[key] = lastHeader;
    });
 
-   if (type == 'init')
-   {
-      aktValues = JSON.parse(JSON.stringify(newValues));
-      aktTypes = JSON.parse(JSON.stringify(newTypes));
-      initFinished.emit('true');
-      mylog("aktValues:",2);
-      mylog(JSON.stringify(aktValues),2);
-   }
-   else
-   {
-      for (var key in newValues)
-      {
-         if (typeof(aktValues[key]) == 'undefined' || newValues[key] != aktValues[key])
-         {
-            aktValues[key] = newValues[key];
-            aktTypes[key] = newTypes[key];
-            var jsonValue = checkValue(key);
-            mylog("JSONvalue: " + JSON.stringify(jsonValue),2);
-            ios.sockets.in("all").emit('value',jsonValue);
-            ios.sockets.in(key).emit('value',jsonValue);
-         }
-      }
-   }
+   aktValues = JSON.parse(JSON.stringify(newValues));
+   aktTypes = JSON.parse(JSON.stringify(newTypes));
+   initFinished.emit('true');
+   mylog("aktValues:",2);
+   mylog(JSON.stringify(aktValues),2);
 }
 
 function setActValue(key,value)
@@ -111,6 +93,10 @@ function getAllSwitches()
    for (var unit in aktValues)
    {
       var value = aktValues[unit];
+      if (value.substr(0,4) === 'set_')
+      {
+         value = value.substr(4);
+      }
       if (value === 'on' || value === 'off' || value === 'toggle')
       {
          allSwitches.push(unit);

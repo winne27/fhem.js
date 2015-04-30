@@ -134,12 +134,30 @@ var defListeners = function(socket)
       }
    });
 
+   socket.on('getDeviceOnChange', function(data)
+   {
+      mylog("request for getDeviceOnChange " + data,1);
+      if(socket.rooms.indexOf(data) < 0)
+      {
+         socket.join('device_' + data);
+      }
+   });
+
    socket.on('getAllValuesOnChange', function(data)
    {
       mylog("request for getAllValuesOnChange",1);
       if(socket.rooms.indexOf('all') < 0)
       {
          socket.join('all');
+      }
+   });
+
+   socket.on('getAllDevicesOnChange', function(data)
+   {
+      mylog("request for getAllDevicesOnChange",1);
+      if(socket.rooms.indexOf('devices_all') < 0)
+      {
+         socket.join('device_all');
       }
    });
 
@@ -276,7 +294,7 @@ function connectFHEMserver()
       mylog("changed data:",2);
       mylog(data.toString(),2);
       clearInterval(reconnectInterval);
-      checkValues(data.toString().split("\n"));
+      handleChangedValues(data.toString().split("\n"));
    });
 
    trigger.on('error', function()
@@ -298,7 +316,7 @@ function connectFHEMserver()
    });
 }
 
-function getValues(type)
+function getAllValues()
 {
    // establish telnet connection to fhem server
    var fhemreq = net.connect({port: params.fhemPort}, function()
@@ -314,7 +332,7 @@ function getValues(type)
 
    fhemreq.on('end', function()
    {
-      buffer.readValues(ios,type,answerStr);
+      buffer.readValues(answerStr);
       fhemreq.end();
       fhemreq.destroy();
    });
@@ -324,48 +342,83 @@ function getValues(type)
       mylog('error: telnet connection for getting values failed - retry in 10 secs',0);
       setTimeout(function ()
       {
-         getValues(type);
+         getAllValues();
       }, 10000);
    });
 
 }
 
-function checkValues(allLines)
+function handleChangedValues(allLines)
 {
-   var lastDevice = '';
-   var doGetValues = false;
-   var foundSingleEntity = true;
-
+   var devices = [];
+   var device_old = '';
    allLines.forEach(function (line)
    {
       line = line.trim().split(' ');
-      var device = line[1];
-      if (lastDevice !== device)
+      if (line.length > 1)
       {
-         lastDevice = device;
-         if (!foundSingleEntity)
+         var device = line[1];
+         if (device === 'global' && line.length() > 3)
          {
-            doGetValues = true;
+            device = line[3];
          }
-         foundSingleEntity = false;
-      }
-      if (line.length === 3)
-      {
-         buffer.setActValue(device,line[2]);
-         var jsonValue = buffer.checkValue(device);
-         foundSingleEntity = true;
-         ios.sockets.in('all').emit('value',jsonValue);
-         ios.sockets.in(device).emit('value',jsonValue);
+         if (line.length === 3)
+         {
+            buffer.setActValue(device,line[2]);
+            var jsonValue = buffer.checkValue(device);
+            ios.sockets.in(device).emit("value",jsonValue);
+            ios.sockets.in("all").emit("value",jsonValue);
+         }
+         if (device_old !== device)
+         {
+            devices.push(device);
+            device_old = device;
+         }
       }
    });
-
-   if (doGetValues)
+   for (var index in devices)
    {
-      getValues('update');
+      getDevice(devices[index]);
    }
 }
 
-getValues('init');
+function getDevice(device)
+{
+   // establish telnet connection to fhem server
+   mylog('get Jsonlist2 for device ' + device,1);
+   var fhemreq = net.connect({port: params.fhemPort}, function()
+   {
+      fhemreq.write('JsonList2 ' + device + ';exit\r\n');
+   });
+
+   var answerStr = '';
+   fhemreq.on('data', function(response)
+   {
+      answerStr += response.toString();
+   });
+
+   fhemreq.on('end', function()
+   {
+      mylog(answerStr,2);
+      var deviceJSON = JSON.parse(answerStr);
+      ios.sockets.in('device_all').emit('device',deviceJSON);
+      ios.sockets.in('device_' + device).emit('device',deviceJSON);
+      fhemreq.end();
+      fhemreq.destroy();
+   });
+
+   fhemreq.on('error', function()
+   {
+      mylog('error: telnet connection for getting JsonList2 failed',0);
+   });
+}
+
+getAllValues();
+
+setInterval(function()
+{
+   getAllValues();
+},300000);
 
 if (params.readDB)
 {
