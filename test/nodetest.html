@@ -16,7 +16,7 @@
 
 <script>
    var changedValues = '';
-   var socket = io.connect('wss://your-domain.tld:8086',
+   var socket = io.connect('wss://home.wernerschaeffer.de:8086',
                                  {
                                     timeout: 5000,
                                     'sync disconnect on unload' : true
@@ -25,6 +25,7 @@
    socket.on('connect', function()
    {
       socket.emit('getAllValuesOnChange');
+      socket.emit('getAllDevicesOnChange');
 
       socket.emit('getAllValues', function(data)
       {
@@ -51,6 +52,11 @@
          changedValues = changedValues + unit + ': ' + value + "<br>";
       }
       document.getElementById("container2").innerHTML = changedValues;
+   });
+
+   socket.on('device',function(data)
+   {
+      console.log(data);
    });
 
    socket.on('disconnect', function()
