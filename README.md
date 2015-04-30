@@ -51,17 +51,22 @@ Establish connection to node.js server by:
      socket = IO.socket(url, options);        
      socket.connect();
 
-**On client you can emit the following async requests:**
+**On client you can emit the following async requests (fast response with minimized data):**
 
   * 'getValueOnce'         : requests a value from fhem once
   * 'getValueOnChange'     : subscribes delivery of a single updated value by a websocket connection
   * 'getAllValuesOnChange' : subscribes delivery of all updated values by a websocket connection
 
+**On client you can emit the following async requests (slower response with much more data):**
+
+  * 'getDeviceOnChange'     : subscribes delivery of a single updated device in JsonList2 format
+  * 'getAllDevicesOnChange' : subscribes delivery of all updated devices in JsonList2 format
+
 Example:
 
     socket.emit('getValueOnChange','fhem-device-name'); 
 
-For catching the response define a listener.
+For catching the response define a listener with label 'value' in the first case and label 'device' in the second case.
 
 Java example:
 
