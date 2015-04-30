@@ -1,5 +1,5 @@
 // set debugging (0,1,2)
-exports.debug = 1;
+exports.debug = 0;
 // port on which node.js service is reachable
 exports.nodePort = 8086;
 
