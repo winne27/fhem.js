@@ -56,7 +56,21 @@ if (params.pathHTML)
       {
          response.writeHead(404);
          response.write("Requested URL does not exist - 404");
+         response.end();
       }
+   });
+
+}
+else
+{
+   mylog('listen for http requests disabled',0);
+   server.on('request',function(request, response)
+   {
+      var path = url.parse(request.url).pathname;
+      mylog('illegal request for ' + path,0);
+      response.writeHead(404);
+      response.write(params.message404);
+      response.end();
    });
 
 }
@@ -68,11 +82,10 @@ if (params.useClientPassword)
    var auth = require('socketio-auth');
    auth(ios,
    {
-      authenticate:    function (password, callback)
+      authenticate: function (password, callback)
       {
          mylog("authentication by client",1);
          var connectionPassword = fs.readFileSync(params.connectionPasswordFile).toString().substr(0,64);
-         //connectionPassword = connectionPassword;
          if (crypto.createHash('sha256').update(password).digest('hex') === connectionPassword)
          {
             mylog("authentication success",1);

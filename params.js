@@ -53,4 +53,4 @@ exports.readDBvalues =
    {table: 'wetterstation.weather', column: 'wind_gust', sort: 'datetime', fhem_name: 'windspeed', refresh: 60, host: 'localhost', user: 'fhem' }
 ];
 
-
+exports.message404 = '<html><head><title>404 Not Found</title></head><body bgcolor="white"><center><h1>404 Not Found</h1></center></body></html>';
