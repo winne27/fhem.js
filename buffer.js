@@ -60,7 +60,6 @@ function readValues(data)
 
    aktValues = JSON.parse(JSON.stringify(newValues));
    aktTypes = JSON.parse(JSON.stringify(newTypes));
-   initFinished.emit('true');
    mylog("aktValues:",2);
    mylog(JSON.stringify(aktValues),2);
 }

@@ -329,7 +329,7 @@ function connectFHEMserver()
    });
 }
 
-function getAllValues()
+function getAllValues(type)
 {
    // establish telnet connection to fhem server
    var fhemreq = net.connect({port: params.fhemPort}, function()
@@ -346,6 +346,10 @@ function getAllValues()
    fhemreq.on('end', function()
    {
       buffer.readValues(answerStr);
+      if (type === 'init')
+      {
+         initFinished.emit('true');
+      }
       fhemreq.end();
       fhemreq.destroy();
    });
@@ -426,11 +430,11 @@ function getDevice(device)
    });
 }
 
-getAllValues();
+getAllValues('init');
 
 setInterval(function()
 {
-   getAllValues();
+   getAllValues('refresh');
 },300000);
 
 if (params.readDB)
