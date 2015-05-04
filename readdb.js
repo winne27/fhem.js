@@ -7,6 +7,7 @@ var pw      = {};
 
 function getDBvalue(dbObj,net)
 {
+   mylog('read ' + dbObj.column + ' from db',1);
    if (!pw[dbObj.host + '_' + dbObj.user])
    {
       pw[dbObj.host + '_' + dbObj.user] = fs.readFileSync(params.pwdir + '/pw_' + dbObj.host + '_' + dbObj.user).toString().replace(/^\s+|\s+$/g, '');

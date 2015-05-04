@@ -375,7 +375,7 @@ function handleChangedValues(allLines)
       if (line.length > 1)
       {
          var device = line[1];
-         if (device === 'global' && line.length() > 3)
+         if (device === 'global' && line.length > 3)
          {
             device = line[3];
          }
@@ -443,11 +443,16 @@ if (params.readDB)
    for (var i in params.readDBvalues)
    {
       var dbObj = params.readDBvalues[i];
-      setInterval(function()
-      {
-         readdb.getDBvalue(dbObj,net);
-      }, dbObj.refresh * 1000);
+      pollDBvalue(dbObj);
    }
+}
+
+function pollDBvalue(dbObj)
+{
+   setInterval(function()
+   {
+      readdb.getDBvalue(dbObj,net);
+   }, dbObj.refresh * 1000);
 }
 
 var messSuff = (params.useSSL) ? 'with SSL' : 'without SSL';
