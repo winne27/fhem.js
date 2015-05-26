@@ -36,7 +36,7 @@ function getDBvalue(dbObj,net)
       }
       else
       {
-         mylog('Error while performing Query.',0);
+         mylog('Error while performing Query:' + sql,0);
       }
       connection.end();
    });

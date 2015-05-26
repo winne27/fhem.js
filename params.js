@@ -1,10 +1,22 @@
 // set debugging (0,1,2)
 exports.debug = 0;
+
 // port on which node.js service is reachable
 exports.nodePort = 8086;
 
 // telnet port of FHEM server
 exports.fhemPort = 7072;
+
+// extended mode
+// 0 - no JsonList2 pushed on change of device (better performance)
+// 1 - JsonList2 of device emitted to clients on changed values
+exports.extendedMode = 0;
+
+// poll in seconds for refresh fhem devices
+// just for keeping buffer sync to fhem server
+// in case of connection problems or configuratuion changes
+// that may not sent from fhem by inform on
+exports.pollForAllDevices = 600
 
 // webserver root directory:
 // path for Webfiles (html,css,js, ...) !! no php !!
@@ -47,11 +59,10 @@ exports.readDB = false;
 // every possible combination of host and user from readDBvalues below requires a password file
 exports.pwdir = '/etc/fhem';
 
-
 exports.readDBvalues =
 [
-   {table: 'wetterstation.weather', column: 'wind_gust', sort: 'datetime', fhem_name: 'windspeed', refresh: 60, host: 'localhost', user: 'fhem' },
-   {table: 'wetterstation.weather', column: 'temp_out', sort: 'datetime', fhem_name: 'temperatur', refresh: 60, host: 'localhost', user: 'fhem' }
+   {table: 'wetterstation.em1010_readings', column: 'total_energy', sort: 'datetime', fhem_name: 'sunenergy', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.em1010_readings', column: 'power', sort: 'datetime', fhem_name: 'sunpower', refresh: 60, host: 'localhost', user: 'fhem' },
 ];
 
 exports.message404 = '<html><head><title>404 Not Found</title></head><body bgcolor="white"><center><h1>404 Not Found</h1></center></body></html>';

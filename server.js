@@ -228,34 +228,40 @@ var defListeners = function(socket)
       callback(units);
    });
 
-   socket.on('JsonList2', function(args,callback)
+   if (params.extendedMode)
    {
-      // establish telnet connection to fhem server
-      mylog("request for JsonList2",1);
-      var fhemcmd = net.connect({port: params.fhemPort}, function()
+      socket.on('JsonList2', function(args,callback)
       {
-          fhemcmd.write('JsonList2 ' + args + ';exit\r\n');
-      });
+         // establish telnet connection to fhem server
+         mylog("request for JsonList2",1);
+         var fhemcmd = net.connect({port: params.fhemPort}, function()
+         {
+             fhemcmd.write('JsonList2 ' + args + ';exit\r\n');
+         });
 
-      var answerStr = '';
-      fhemcmd.on('data', function(response)
-      {
-         answerStr += response.toString().replace("\n","");
-      });
+         var answerStr = '';
+         fhemcmd.on('data', function(response)
+         {
+            answerStr += response.toString().replace("\n","");
+         });
 
-      fhemcmd.on('end', function()
-      {
-         var answer = JSON.parse(answerStr);
-         mylog(answer,2);
-         callback(answer);
-         fhemcmd.end();
-         fhemcmd.destroy();
+         fhemcmd.on('end', function()
+         {
+            var startPos = answerStr.indexOf('{');
+            var lastPos  = answerStr.lastIndexOf('}');
+            answerStr = answerStr.substr(startPos,lastPos - startPos + 1);
+            var answer = JSON.parse(answerStr);
+            mylog(answer,2);
+            callback(answer);
+            fhemcmd.end();
+            fhemcmd.destroy();
+         });
+         fhemcmd.on('error', function()
+         {
+            funcs.mylog('error: telnet connection failed',0);
+         });
       });
-      fhemcmd.on('error', function()
-      {
-         funcs.mylog('error: telnet connection failed',0);
-      });
-   });
+   }
 
    socket.on('commandNoResp', function(data)
    {
@@ -393,9 +399,12 @@ function handleChangedValues(allLines)
          }
       }
    });
-   for (var index in devices)
+   if (params.extendedMode)
    {
-      getDevice(devices[index]);
+      for (var index in devices)
+      {
+         getDevice(devices[index]);
+      }
    }
 }
 
@@ -417,6 +426,9 @@ function getDevice(device)
    fhemreq.on('end', function()
    {
       mylog(answerStr,2);
+      var startPos = answerStr.indexOf('{');
+      var lastPos  = answerStr.lastIndexOf('}');
+      answerStr = answerStr.substr(startPos,lastPos - startPos + 1);
       var deviceJSON = JSON.parse(answerStr);
       ios.sockets.in('device_all').emit('device',deviceJSON);
       ios.sockets.in('device_' + device).emit('device',deviceJSON);
@@ -430,12 +442,22 @@ function getDevice(device)
    });
 }
 
+function pollDBvalue(dbObj)
+{
+   setInterval(function()
+   {
+      readdb.getDBvalue(dbObj,net);
+   }, dbObj.refresh * 1000);
+}
+
+// ----- Main -------------------
+
 getAllValues('init');
 
 setInterval(function()
 {
    getAllValues('refresh');
-},300000);
+},params.pollForAllDevices * 1000);
 
 if (params.readDB)
 {
@@ -445,14 +467,6 @@ if (params.readDB)
       var dbObj = params.readDBvalues[i];
       pollDBvalue(dbObj);
    }
-}
-
-function pollDBvalue(dbObj)
-{
-   setInterval(function()
-   {
-      readdb.getDBvalue(dbObj,net);
-   }, dbObj.refresh * 1000);
 }
 
 var messSuff = (params.useSSL) ? 'with SSL' : 'without SSL';
