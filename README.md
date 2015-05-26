@@ -44,7 +44,7 @@ To secure the connection to this node.js server with SSL set
 
 # Client
 
-On client side you need socket.io (tested with diverent browsers and with Android Java using java class [com.github.nkzawa.socketio.client](https://github.com/nkzawa/socket.io-client.java) for realizing a websocket connection.).
+On client side you need socket.io (tested with different browsers and with Android Java using java class [com.github.nkzawa.socketio.client](https://github.com/nkzawa/socket.io-client.java) for realizing a websocket connection.).
 
 Establish connection to node.js server by:
 
