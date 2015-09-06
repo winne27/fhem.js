@@ -33,7 +33,6 @@ exports.indexHTML = 'index.html';
 exports.useSSL = false;
 
 // use connection password (true/false)
-// it is recommended to use this only if useSSL is also true
 // else the password is send as plain text
 exports.useClientPassword = false;
 
@@ -63,6 +62,15 @@ exports.readDBvalues =
 [
    {table: 'wetterstation.em1010_readings', column: 'total_energy', sort: 'datetime', fhem_name: 'sunenergy', refresh: 60, host: 'localhost', user: 'fhem' },
    {table: 'wetterstation.em1010_readings', column: 'power', sort: 'datetime', fhem_name: 'sunpower', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'wind_speed', sort: 'datetime', fhem_name: 'windspeed', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'wind_gust', sort: 'datetime', fhem_name: 'windgust', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'wind_direction', sort: 'datetime', fhem_name: 'winddir', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'rel_hum_out', sort: 'datetime', fhem_name: 'huminity', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'rel_pressure', sort: 'datetime', fhem_name: 'pressure', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'rain_1h', sort: 'datetime', fhem_name: 'rain1h', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'rain_24h', sort: 'datetime', fhem_name: 'rain24h', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'dewpoint', sort: 'datetime', fhem_name: 'dewpoint', refresh: 60, host: 'localhost', user: 'fhem' },
+   {table: 'wetterstation.weather', column: 'temp_out', sort: 'datetime', fhem_name: 'temperatur', refresh: 60, host: 'localhost', user: 'fhem' }
 ];
 
 exports.message404 = '<html><head><title>404 Not Found</title></head><body bgcolor="white"><center><h1>404 Not Found</h1></center></body></html>';

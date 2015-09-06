@@ -104,29 +104,20 @@ if (params.useClientPassword)
 // handle for the websocket connection from client
 ios.sockets.on('connection', function(socket)
 {
-/*   socket.emit('connected');
-   var waitAuth = setTimeout(function ()
-   {
-      defListeners(socket);
-   }, 3000);*/
+   mylog("client connected",0);
+
    //emit authenticated if no passwd is used
 
    if (!params.useClientPassword)
    {
-      mylog("emit authenticated",1);
-      //clearTimeout(waitAuth);
+      mylog("emit authenticated cause no auth needed",1);
       socket.emit('authenticated');
-   }
-   else
-   {
-      //clearTimeout(waitAuth);
    }
    defListeners(socket);
 });
 
 var defListeners = function(socket)
 {
-   mylog("client connected",0);
    socket.on('getValueOnce', function(data)
    {
       var jsonValue = buffer.checkValue(data);
@@ -143,7 +134,7 @@ var defListeners = function(socket)
       mylog("request for getValueOnChange " + data,1);
       if(socket.rooms.indexOf(data) < 0)
       {
-         socket.join(data);
+         socket.join(data.replace('_','UNDERLINE'));
       }
    });
 
@@ -152,7 +143,7 @@ var defListeners = function(socket)
       mylog("request for getDeviceOnChange " + data,1);
       if(socket.rooms.indexOf(data) < 0)
       {
-         socket.join('device_' + data);
+         socket.join('device' + data.replace('_','UNDERLINE'));
       }
    });
 
@@ -389,7 +380,7 @@ function handleChangedValues(allLines)
          {
             buffer.setActValue(device,line[2]);
             var jsonValue = buffer.checkValue(device);
-            ios.sockets.in(device).emit("value",jsonValue);
+            ios.sockets.in(device.replace('_','UNDERLINE')).emit("value",jsonValue);
             ios.sockets.in("all").emit("value",jsonValue);
          }
          if (device_old !== device)
