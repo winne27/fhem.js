@@ -15,6 +15,10 @@ Install node.js plugin socket.io with
 
     npm install -g socket.io
 
+If client authentication by password is used install also package socket-auth by
+
+    npm install -g socket-auth
+
 Copy this package to a directory of your choice (e.g. /var/www/fhem.js).
 Have a look to param.js of this package. Adjust telnet port of fhem if neccessary.
 Change to installation directory and start the server with
