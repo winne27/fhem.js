@@ -30,11 +30,12 @@ exports.pathHTML = false;
 exports.indexHTML = 'index.html';
 
 // use SSL for conversation (true/false)
-exports.useSSL = false;
+exports.useSSL = true;
 
 // use connection password (true/false)
+// it is recommended to use this only if useSSL is also true
 // else the password is send as plain text
-exports.useClientPassword = false;
+exports.useClientPassword = true;
 
 // location of sha-256 hashed password
 // only needed if useClientPassword = true
@@ -52,7 +53,7 @@ exports.sslcert =
 exports.cipher = 'HIGH:!aNULL:!MD5';
 
 // use this application for providing mySql values to fhem
-exports.readDB = false;
+exports.readDB = true;
 
 // in /etc/fhem (default) must exist a file named pw_host_user containing password for mysql connection
 // every possible combination of host and user from readDBvalues below requires a password file

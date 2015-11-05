@@ -1,5 +1,5 @@
 /*
-** use this script with socket-auth Version 0.0.4 and newer  
+** use this script with socket-auth Version 0.0.3 and older
 */
 var url     = require('url');
 var fs      = require('fs');
@@ -85,7 +85,7 @@ if (params.useClientPassword)
    var auth = require('socketio-auth');
    auth(ios,
    {
-      authenticate: function (socket, password, callback)
+      authenticate: function (password, callback)
       {
          mylog("authentication by client",1);
          var connectionPassword = fs.readFileSync(params.connectionPasswordFile).toString().substr(0,64);
