@@ -9,27 +9,32 @@ done
 
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-pwd
-echo $DIR
+cd $DIR/..
+DIR=`pwd`
 
-echo "eins";
-if [ ! -f /etc/fhem.js/ ]
+if [ ! -d /etc/fhem.js ]
 then
    mkdir /etc/fhem.js
 fi
 
-cp -r $DIR/../etc/fhem.js/* /etc/fhem.js/
+cp -r etc/fhem.js/* /etc/fhem.js/
 
-echo "zwei";
-if [ -f /etc/init.d/ ]
+if [ -d /etc/init.d ]
 then
-   cp -r $DIR/../etc/init.d/* /etc/init.d/
+   cp -r etc/init.d/* /etc/init.d/
 fi
 
-if [ ! -f $DIR/../params.js ]
+if [ ! -f params.js ]
 then
-   cp -r $DIR/../params.js.dist $DIR/../params.js
+   cp -r params.js.dist params.js
 fi
-echo "drei";
-ln -s $DIR/../params.js /etc/fhem.js/params.js
-ln -s $DIR/../params.js.dist /etc/fhem.js/params.js.dist
+
+if [ ! -L /etc/fhem.js/params.js ]
+then
+   ln -s $DIR/params.js /etc/fhem.js/params.js
+fi
+
+if [ ! -L /etc/fhem.js/params.js.dist ]
+then
+   ln -s $DIR/params.js.dist /etc/fhem.js/params.js.dist
+fi

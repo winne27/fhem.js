@@ -15,12 +15,11 @@ LOGFILE=/var/log/$NAME.log
 ERRORLOG=/var/log/$NAME.error
 //export NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
 PIDFILE=/var/run/$NAME.pid
-SCRIPT=/var/local/bin/fhem.js
 
 start() {
     echo "Starting $NAME node instance: "
 
-    $SCRIPT -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE
+    fhem.js -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE
     RETVAL=$?
 }
 
