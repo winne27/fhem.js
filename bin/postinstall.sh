@@ -10,6 +10,11 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 mkdir /etc/fhem.js
 
+if [ -f /etc/fhem.js/ ]
+then
+   mkdir /etc/fhem.js
+fi
+
 cp -r $DIR/../etc/fhem.js/* /etc/fhem.js/
 
 if [ -f /etc/init.d/ ]
