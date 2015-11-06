@@ -8,13 +8,19 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-
 mkdir /etc/fhem.js
-ln -s $DIR/../params.js /etc/fhem.js params.js
+
+cp -r $DIR/../etc/fhem.js/* /etc/fhem.js/
 
 if [ -f /etc/init.d/ ]
 then
-   cp $DIR/../etc/init.d/fhem.js /etc/init.d/
+   cp -r $DIR/../etc/init.d/* /etc/init.d/
 fi
 
+if [ ! -f $DIR/../params.js ]
+then
+   cp -r $DIR/../params.js.dist $DIR/../params.js
+fi
 
+ln -s $DIR/../params.js /etc/fhem.js/params.js
+ln -s $DIR/../params.js.dist /etc/fhem.js/params.js.dist
