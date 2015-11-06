@@ -1,0 +1,2 @@
+replace-this-line-by-password-for-mysql-connection
+and copy this file to pw_localhost_fhem (or to pw_yourMysqlHostname_yourMysqlUser)  

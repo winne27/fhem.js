@@ -1,0 +1,1 @@
+set connection password by: echo -n "mein Passwort" | sha256sum | cut -d' ' -f1 > /etc/fhem.js/pw_client_auth
