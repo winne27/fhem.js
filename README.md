@@ -17,19 +17,25 @@ Install the package with
 
 into directory /usr/lib/node_modules/fhem.js.
 
-Have a look to params.js of this package. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there. 
+Have a look to params.js (there is a symlink in /etc/fhem.js/) of this package. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there. 
 
 Now starting the server with
 
-   /usr/local/bin/fhem.js
+   /usr/bin/fhem.js
 
-or when /usr/local/bin is in your path simply by
+or when /usr/bin is in your path simply by
 
    fhem.js
 
-# Start as service
+# Autostart as service
 
-Copy /usr/lib/node_modules/fhem.js/etc/init.d to /etc/init.d 
+If this package is installed on a system with /etc/init.d for starting init processes in this directory a file named fhem.js is found after installation.
+
+Check this file for some parameters in case you don't like the defaults.
+
+Activate autostart by
+
+   sudo update-rc.d fhem.js enable
 
 # Operation breakdown
 
