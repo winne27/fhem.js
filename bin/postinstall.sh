@@ -13,7 +13,7 @@ pwd
 echo $DIR
 
 echo "eins";
-if [ -f /etc/fhem.js/ ]
+if [ ! -f /etc/fhem.js/ ]
 then
    mkdir /etc/fhem.js
 fi
