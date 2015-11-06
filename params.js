@@ -29,7 +29,7 @@ exports.pathHTML = false;
 // default html page
 exports.indexHTML = 'index.html';
 
-// use SSL for conversation (true/false)
+// use SSL for connections (true/false)
 exports.useSSL = false;
 
 // use connection password (true/false)
@@ -53,11 +53,15 @@ exports.sslcert =
 exports.cipher = 'HIGH:!aNULL:!MD5';
 
 // use this application for providing mySql values to fhem
-exports.readDB = true;
+exports.readDB = false;
 
-// in /etc/fhem (default) must exist a file named pw_host_user containing password for mysql connection
+// fhem.js reads every "refresh" seconds from "table"."column" ordered by "sort" desc one value
+// from database "fhem"@"localhost" and set the fhem dummy device "fhem_name" to this value.
+//
+// in /etc/fhem.js (default) must exist a file named pw_host_user containing password for mysql connection
 // every possible combination of host and user from readDBvalues below requires a password file
-exports.pwdir = '/etc/fhem';
+
+exports.pwdir = '/etc/fhem.js';
 
 exports.readDBvalues =
 [
