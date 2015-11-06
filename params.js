@@ -30,18 +30,18 @@ exports.pathHTML = false;
 exports.indexHTML = 'index.html';
 
 // use SSL for conversation (true/false)
-exports.useSSL = true;
+exports.useSSL = false;
 
 // use connection password (true/false)
 // it is recommended to use this only if useSSL is also true
 // else the password is send as plain text
-exports.useClientPassword = true;
+exports.useClientPassword = false;
 
 // location of sha-256 hashed password
 // only needed if useClientPassword = true
 // create it on Linux shell with
-// echo -n "mein Passwort" | sha256sum | cut -d' ' -f1 > /etc/fhem/pw_client_auth
-exports.connectionPasswordFile = '/etc/fhem/pw_client_auth';
+// echo -n "mein Passwort" | sha256sum | cut -d' ' -f1 > /etc/fhem.js/pw_client_auth
+exports.connectionPasswordFile = '/etc/fhem.js/pw_client_auth';
 
 // location of SSL and client-auth certificats
 // only used then useSSL set to true
