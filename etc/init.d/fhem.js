@@ -2,30 +2,25 @@
 #
 ### BEGIN INIT INFO
 # Provides: fhem.js
-# description:  fhem.js init.d example using forever (install with: npm install -g forever)
-# Required-Start: $local_fs $remote_fs $network $syslog mysql fhem
+# description:  fhem.js init.d example 
+# Required-Start: $local_fs $remote_fs $network $syslog 
 # Required-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 #
 ### END INIT INFO
 
-
-# Source function library.
-
-NAME=fhem                     # Unique name for the application
-SOURCE_DIR=/var/www/fhem.js   # Location of the application source
-SOURCE_NAME=server.js         # Name of the applcation entry point script
-LOG_DIR=/var/log/fhem
-RUN_DIR=/var/run
-export NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
-
-pidfile=/var/run/$NAME.pid
+NAME=fhem.js                  # Unique name for the application
+LOGFILE=/var/log/$NAME.log
+ERRORLOG=/var/log/$NAME.error
+//export NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
+PIDFILE=/var/run/$NAME.pid
+SCRIPT=/var/local/bin/fhem.js
 
 start() {
     echo "Starting $NAME node instance: "
 
-    forever start --pidFile=$pidfile -e $LOG_DIR/error.log -l $LOG_DIR/$NAME.log -a --workingDir $SOURCE_DIR --uid "$NAME"  $SOURCE_DIR/$SOURCE_NAME
+    $SCRIPT -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE
     RETVAL=$?
 }
 

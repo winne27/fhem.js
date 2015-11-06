@@ -11,19 +11,25 @@ The websocket connection will deliver this values just in time. Furthermore fhem
 Install first node.js on the server on which fhem is installed. 
 Ensure that telnet is enabled on the standard fhem server.
 
-Install node.js plugin socket.io with
+Install the package with
 
-    npm install -g socket.io
+    npm install -g fhem.js
 
-If client authentication by password is used install also package socket-auth by
+into directory /usr/lib/node_modules/fhem.js.
 
-    npm install -g socket-auth
+Have a look to params.js of this package. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there. 
 
-Copy this package to a directory of your choice (e.g. /var/www/fhem.js).
-Have a look to param.js of this package. Adjust telnet port of fhem if neccessary.
-Change to installation directory and start the server with
+Now starting the server with
 
-    node.js start server.js
+   /usr/local/bin/fhem.js
+
+or when /usr/local/bin is in your path simply by
+
+   fhem.js
+
+# Start as service
+
+Copy /usr/lib/node_modules/fhem.js/etc/init.d to /etc/init.d 
 
 # Operation breakdown
 
