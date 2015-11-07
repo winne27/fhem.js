@@ -13,9 +13,9 @@ Ensure that telnet is enabled on the standard fhem server.
 
 Install the package with
 
-    npm install -g fhem.js
+    npm install --unsafe-perm -g fhem.js
 
-into directory /usr/lib/node_modules/fhem.js.
+into directory /usr/lib/node_modules/fhem.js. All needed packages like socket.io, socket-auth and forever were automatically installed. The option --unsafe-perm supresses a lot of messages produced by socket.io installation.
 
 Have a look to params.js (there is a symlink in /etc/fhem.js/) of this package. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there.
 
@@ -30,12 +30,14 @@ or when /usr/bin is in your path simply by
 # Autostart as service
 
 If this package is installed on a system with /etc/init.d for starting init processes in this directory a file named fhem.js is found after installation.
-
 Check this file for some parameters in case you don't like the defaults.
 
 Activate autostart by
 
    sudo update-rc.d fhem.js enable
+
+Not in every Linux distribution this folder exists, but the script can also be found
+in path-to-nodejs-modules/fhem.js/etc/init.d (Default of path-to-nodejs-modules: /usr/lib/node_modules).
 
 # Operation breakdown
 
@@ -168,12 +170,3 @@ Java example for getAllUnitsOf (with "LightScene" as argument type):
 
 The folder "test" contains a html/javascript example for an client program.
 
-# Start as service
-
-For starting fhem.js server as service using forever is recommended. Install it with:
-
-    npm install -g forever
-
-In the folder /etc/init.d is an example for a start/stop script using forever.
-Not in every Linux distribution this folder exists, but the script can also be found
-in path-to-nodejs-modules/fhem.js/etc/init.d (Default of path-to-nodejs-modules: /usr/lib/node_modules).
