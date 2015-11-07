@@ -53,6 +53,9 @@ exports.sslcert =
 exports.cipher = 'HIGH:!aNULL:!MD5';
 
 // use this application for providing mySql values to fhem
+// before using this feature first install mysql modul with
+// npm install -g mysql
+
 exports.readDB = false;
 
 // fhem.js reads every "refresh" seconds from "table"."column" ordered by "sort" desc one value

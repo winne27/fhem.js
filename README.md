@@ -17,7 +17,7 @@ Install the package with
 
 into directory /usr/lib/node_modules/fhem.js.
 
-Have a look to params.js (there is a symlink in /etc/fhem.js/) of this package. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there. 
+Have a look to params.js (there is a symlink in /etc/fhem.js/) of this package. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there.
 
 Now starting the server with
 
@@ -175,3 +175,5 @@ For starting fhem.js server as service using forever is recommended. Install it 
     npm install -g forever
 
 In the folder /etc/init.d is an example for a start/stop script using forever.
+Not in every Linux distribution this folder exists, but the script can also be found
+in path-to-nodejs-modules/fhem.js/etc/init.d (Default of path-to-nodejs-modules: /usr/lib/node_modules).

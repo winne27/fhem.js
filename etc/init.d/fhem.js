@@ -19,18 +19,18 @@ PIDFILE=/var/run/$NAME.pid
 start() {
     echo "Starting $NAME node instance: "
 
-    fhem.js -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE
+    /usr/bin/fhem.js -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE
     RETVAL=$?
 }
 
 restart() {
     echo -n "Restarting $NAME node instance : "
-    forever restart $NAME
+    /usr/bin/forever restart $NAME
     RETVAL=$?
 }
 
 stop() {
-    forever stop $NAME
+    /usr/bin/forever stop $NAME
     RETVAL=$?
 }
 
@@ -42,7 +42,7 @@ case "$1" in
         stop
         ;;
     status)
-       forever list 
+       /usr/bin/forever list
        RETVAL=$?
         ;;
     restart)
