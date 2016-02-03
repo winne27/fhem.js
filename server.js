@@ -144,7 +144,7 @@ var defListeners = function(socket)
    socket.on('getDeviceOnChange', function(data)
    {
       mylog("request for getDeviceOnChange " + data,1);
-      if(socket.rooms) == 'undefined' || socket.rooms.indexOf(data) < 0)
+      if (typeof(socket.rooms) == 'undefined' || socket.rooms.indexOf(data) < 0)
       {
          socket.join('device' + data.replace('_','UNDERLINE'));
       }
@@ -153,7 +153,7 @@ var defListeners = function(socket)
    socket.on('getAllValuesOnChange', function(data)
    {
       mylog("request for getAllValuesOnChange",1);
-      if(socket.rooms.indexOf('all') < 0)
+      if (typeof(socket.rooms) == 'undefined' || socket.rooms.indexOf('all') < 0)
       {
          socket.join('all');
       }
@@ -162,7 +162,7 @@ var defListeners = function(socket)
    socket.on('getAllDevicesOnChange', function(data)
    {
       mylog("request for getAllDevicesOnChange",1);
-      if(socket.rooms.indexOf('devices_all') < 0)
+      if (typeof(socket.rooms) == 'undefined' || socket.rooms.indexOf('devices_all') < 0)
       {
          socket.join('device_all');
       }
