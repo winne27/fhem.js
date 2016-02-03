@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 NAME=fhem.js
 PIDFILE=/var/run/fhem.js.pid
 LOGFILE=/var/log/fhem.js.log

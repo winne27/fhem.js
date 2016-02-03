@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+#  
 ### BEGIN INIT INFO
 # Provides: fhem.js
 # description:  fhem.js init.d example 
