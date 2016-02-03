@@ -13,24 +13,25 @@
 NAME=fhem.js                  # Unique name for the application
 LOGFILE=/var/log/$NAME.log
 ERRORLOG=/var/log/$NAME.error
-//export NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
 PIDFILE=/var/run/$NAME.pid
+FOREVER=/usr/bin/forever
+FHEMJSSTART=/usr/bin/fhem.js
 
 start() {
     echo "Starting $NAME node instance: "
 
-    /usr/bin/fhem.js -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE
+    $FHEMJSSTART -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE -f $FOREVER
     RETVAL=$?
 }
 
 restart() {
     echo -n "Restarting $NAME node instance : "
-    /usr/bin/forever restart $NAME
+    $FOREVER restart $NAME
     RETVAL=$?
 }
 
 stop() {
-    /usr/bin/forever stop $NAME
+    $FOREVER stop $NAME
     RETVAL=$?
 }
 
@@ -42,7 +43,7 @@ case "$1" in
         stop
         ;;
     status)
-       /usr/bin/forever list
+       $FOREVER list
        RETVAL=$?
         ;;
     restart)

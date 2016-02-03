@@ -1,1 +1,6 @@
-set connection password by: echo -n "mein Passwort" | sha256sum | cut -d' ' -f1 > /etc/fhem.js/pw_client_auth
+Only if you set client authentication by password (in params.js exports.useClientPassword = true; is set)
+create connection password to fhem.js by the following shell command:
+
+echo -n "my password" | sha256sum | cut -d' ' -f1 > /etc/fhem.js/pw_client_auth
+
+(replace "my Password" to a password of your choice)

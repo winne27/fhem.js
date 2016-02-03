@@ -4,6 +4,7 @@ NAME=fhem.js
 PIDFILE=/var/run/fhem.js.pid
 LOGFILE=/var/log/fhem.js.log
 ERRORLOG=/var/log/fhem.js.error
+FOREVER=/usr/bin/forever
 
 while getopts "p:l:e:n:" opt; do
   case $opt in
@@ -18,6 +19,9 @@ while getopts "p:l:e:n:" opt; do
       ;;
     n)
       NAME=$OPTARG
+      ;;
+    f)
+      FOREVER=$OPTARG
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -35,4 +39,4 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd $DIR/..
 DIR=`pwd`
 
-forever start --uid "$NAME" --pidFile /var/run/fhem.js.pid -e /var/log/fhem.js.error -l /var/log/fhem.js.log -a --workingDir $DIR  $DIR
+$FOREVER start --uid "$NAME" --pidFile /var/run/fhem.js.pid -e /var/log/fhem.js.error -l /var/log/fhem.js.log -a --workingDir $DIR  $DIR

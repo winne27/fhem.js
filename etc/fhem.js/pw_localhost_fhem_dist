@@ -1,2 +1,3 @@
-replace-this-line-by-password-for-mysql-connection
-and copy this file to pw_localhost_fhem (or to pw_yourMysqlHostname_yourMysqlUser)  
+Only if you need direct connection to a mySql database (in params.js exports.readDB = true; is set):
+Create a file named pw_yourMysqlHostname_yourMysqlUser (e.g. pw_localhost_fhem)
+and put the password for this connection in this file

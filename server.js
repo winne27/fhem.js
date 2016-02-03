@@ -135,7 +135,7 @@ var defListeners = function(socket)
    socket.on('getValueOnChange', function(data)
    {
       mylog("request for getValueOnChange " + data,1);
-      if(socket.rooms.indexOf(data) < 0)
+      if(typeof(socket.rooms) == 'undefined' || socket.rooms.indexOf(data) < 0)
       {
          socket.join(data.replace('_','UNDERLINE'));
       }
@@ -144,7 +144,7 @@ var defListeners = function(socket)
    socket.on('getDeviceOnChange', function(data)
    {
       mylog("request for getDeviceOnChange " + data,1);
-      if(socket.rooms.indexOf(data) < 0)
+      if(socket.rooms) == 'undefined' || socket.rooms.indexOf(data) < 0)
       {
          socket.join('device' + data.replace('_','UNDERLINE'));
       }
@@ -381,10 +381,13 @@ function handleChangedValues(allLines)
          }
          if (line.length === 3)
          {
-            buffer.setActValue(device,line[2]);
-            var jsonValue = buffer.checkValue(device);
-            ios.sockets.in(device.replace('_','UNDERLINE')).emit("value",jsonValue);
-            ios.sockets.in("all").emit("value",jsonValue);
+            if (buffer.setActValue(device,line[2]))
+            {
+                var jsonValue = buffer.checkValue(device);
+                var device2 = device.replace('_','UNDERLINE');
+                ios.sockets.in(device2).emit("value",jsonValue);
+                ios.sockets.in("all").emit("value",jsonValue);
+            }
          }
          if (device_old !== device)
          {
