@@ -13,11 +13,11 @@ Ensure that telnet is enabled on the standard fhem server.
 
 Install the package with
 
-    npm install --unsafe-perm -g fhem.js
+    npm install -g fhem.js
 
-into directory /usr/lib/node_modules/fhem.js. All needed packages like socket.io, socket-auth and forever were automatically installed. The option --unsafe-perm supresses a lot of messages produced by socket.io installation.
+into directory /usr/lib/node_modules/fhem.js. All needed packages like socket.io, socket-auth and forever were automatically installed.
 
-Have a look to params.js (there is a symlink in /etc/fhem.js/) of this package. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there.
+Have a look to /etc/fhem.js/params.js. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there.
 
 Now starting the server with
 

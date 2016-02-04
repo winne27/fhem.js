@@ -1,6 +1,6 @@
 {
   "name": "fhem.js",
-  "version": "2.1.14",
+  "version": "2.1.15",
   "description": "This is a node.js server for fhem (home automation). It allows clients connecting to fhem by websockets. ",
   "main": "server.js",
   "directories": {
@@ -17,12 +17,13 @@
   },
   "scripts": {
     "start": "node server.js",
+    "preinstall": "./bin/preinstall.sh",
     "postinstall": "./bin/postinstall.sh",
     "preuninstall": "./bin/preuninstall.sh"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/winne27/fhem.js.git"
+    "url": "https://github.com/winne27/fhem.js.git"
   },
   "keywords": [
     "fhem",
@@ -30,14 +31,12 @@
     "websockets"
   ],
   "author": {
-    "name": "Werner SchÃ¤ffer",
+    "name": "Werner Schäffer",
     "email": "werner@schaeffer.net",
     "url": "https://wernerschaeffer.de"
   },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/winne27/fhem.js/issues"
-  },
-  "homepage": "https://github.com/winne27/fhem.js",
-  "readmeFilename": "README.md"
+  }
 }
