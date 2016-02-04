@@ -14,7 +14,7 @@ DIR=`pwd`
 
 if [ ! -d /etc/fhem.js ]
 then
-   sudo mkdir /etc/fhem.js
+   mkdir /etc/fhem.js
    if [ "$?" -gt 0 ]
    then
       echo "Create directory /etc/fhem.js first"
@@ -22,11 +22,11 @@ then
    fi
 fi
 
-sudo cp -r etc/fhem.js/* /etc/fhem.js/
+cp -r etc/fhem.js/* /etc/fhem.js/
 
-if [ -d /etc/init.d ]
+if [ ! -L /etc/init.d/fhem.js ]
 then
-   sudo cp -r etc/init.d/* /etc/init.d/
+   ln -s  $dir/etc/init.d/fhem.js /etc/init.d/fhem.js
 fi
 
 if [ ! -f /etc/fhem.js/params.js ]
@@ -39,9 +39,4 @@ then
    ln -s $DIR/params.js.dist /etc/fhem.js/params.js.dist
 fi
 
-if [ ! -L $DIR/params.js ]
-then
-   ln -s /etc/fhem.js/params.js $DIR/params.js
-fi
-
-ln -sf $DIR/bin/fhem.js /usr/bin/fhem.js
+ln -sf /etc/fhem.js/params.js $DIR/params.js
