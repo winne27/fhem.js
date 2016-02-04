@@ -12,11 +12,21 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd $DIR/..
 DIR=`pwd`
 
-cp -r etc/fhem.js/* /etc/fhem.js/
+if [ ! -d /etc/fhem.js ]
+then
+   sudo mkdir /etc/fhem.js
+   if [ "$?" -gt 0 ]
+   then
+      echo "Create directory /etc/fhem.js first"
+      exit 2
+   fi
+fi
+
+sudo cp -r etc/fhem.js/* /etc/fhem.js/
 
 if [ -d /etc/init.d ]
 then
-   cp -r etc/init.d/* /etc/init.d/
+   sudo cp -r etc/init.d/* /etc/init.d/
 fi
 
 if [ ! -f /etc/fhem.js/params.js ]
