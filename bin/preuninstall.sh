@@ -5,6 +5,8 @@ then
    rm -f /etc/init.d/fhem.js
 fi
 
+rm -f /etc/fhem.js/*dist
+
 if [ -d /etc/fhem.js ]
 then
    while true; do

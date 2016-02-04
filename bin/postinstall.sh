@@ -1,5 +1,5 @@
 #!/bin/bash
- 
+
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
@@ -24,17 +24,17 @@ then
    cp -r etc/init.d/* /etc/init.d/
 fi
 
-if [ ! -f params.js ]
+if [ ! -f /etc/fhem.js/params.js ]
 then
-   cp -r params.js.dist params.js
-fi
-
-if [ ! -L /etc/fhem.js/params.js ]
-then
-   ln -s $DIR/params.js /etc/fhem.js/params.js
+   cp -r $DIR/params.js.dist /etc/fhem.js/params.js
 fi
 
 if [ ! -L /etc/fhem.js/params.js.dist ]
 then
    ln -s $DIR/params.js.dist /etc/fhem.js/params.js.dist
+fi
+
+if [ ! -L $DIR/params.js ]
+then
+   ln -s /etc/fhem.js/params.js $DIR/params.js
 fi
