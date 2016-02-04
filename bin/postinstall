@@ -8,7 +8,7 @@ DIR=`pwd`
 
 if [ ! -d /etc/fhem.js ]
 then
-   mkdir /etc/mkdir
+   mkdir /etc/fhem.js
 fi
 
 cp -r etc/fhem.js/* /etc/fhem.js/
