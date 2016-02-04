@@ -1,0 +1,24 @@
+#!/bin/bash
+
+SOURCE="${BASH_SOURCE[0]}"
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+cd $DIR/..
+DIR=`pwd`
+
+if [ ! -d /etc/fhem.js ]
+then
+   mkdir /etc/mkdir
+fi
+
+cp -r etc/fhem.js/* /etc/fhem.js/
+
+cp $DIR/etc/init.d/fhem.js /etc/init.d/fhem.js
+
+if [ ! -f /etc/fhem.js/params.js ]
+then
+   cp /etc/fhem.js/params.js.dist /etc/fhem.js/params.js
+fi
+
+rm $DIR/params.js
+ln -sf /etc/fhem.js/params.js $DIR/params.js

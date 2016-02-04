@@ -17,15 +17,21 @@ Install the package with
 
 into directory /usr/lib/node_modules/fhem.js. All needed packages like socket.io, socket-auth and forever were automatically installed.
 
+Now run as root:
+
+    sudo /usr/lib/node_modules/fhem.js/bin/postinstall
+
+This will establish the config environment in /etc/fhem.js and /etc/init.d.
+
 Have a look to /etc/fhem.js/params.js. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there.
 
 Now starting the server with
 
-   /usr/bin/fhem.js
+    /usr/bin/fhem.js
 
 or when /usr/bin is in your path simply by
 
-   fhem.js
+    fhem.js
 
 # Autostart as service
 

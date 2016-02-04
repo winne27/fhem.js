@@ -1,9 +1,11 @@
 {
   "name": "fhem.js",
-  "version": "2.1.18",
+  "version": "2.1.19",
   "description": "This is a node.js server for fhem (home automation). It allows clients connecting to fhem by websockets. ",
   "main": "server.js",
   "bin": "./bin/fhem.js",
+  "engines" : { "node" : ">=4.0.0" },
+  "os" : [ "linux" ],
   "dependencies": {
     "forever": "latest",
     "socket.io": "latest",
@@ -15,8 +17,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "postinstall": "./bin/postinstall.sh",
-    "preuninstall": "./bin/preuninstall.sh"
+    "postinstall": "./bin/postinstall.sh"
   },
   "repository": {
     "type": "git",

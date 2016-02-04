@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ -L /etc/init.d/fhem.js ]
-then
-   rm -f /etc/init.d/fhem.js
-fi
-
 rm -f /etc/fhem.js/*dist
 
 if [ -d /etc/fhem.js ]
