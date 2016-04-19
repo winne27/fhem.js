@@ -11,6 +11,16 @@ then
    mkdir /etc/fhem.js
 fi
 
+if [ -L /etc/fhem.js/params.js ]
+then
+   rm /etc/fhem.js/params.js
+fi
+
+if [ -L /etc/fhem.js/params.js.dist ]
+then
+   rm /etc/fhem.js/params.js.dist
+fi
+
 cp -r etc/fhem.js/* /etc/fhem.js/
 
 cp $DIR/etc/init.d/fhem.js /etc/init.d/fhem.js
