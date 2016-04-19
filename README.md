@@ -8,7 +8,10 @@ The websocket connection will deliver this values just in time. Furthermore fhem
 
 # Install
 
-Install first node.js on the server on which fhem is installed. 
+Install first node.js on the server on which fhem is installed. Ensure that the version of node.js is greater than 4.x. Check it with
+
+    node -v
+
 Ensure that telnet is enabled on the standard fhem server.
 
 Install the package with
