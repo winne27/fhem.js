@@ -30,5 +30,5 @@ then
    cp /etc/fhem.js/params.js.dist /etc/fhem.js/params.js
 fi
 
-rm $DIR/params.js
+rm $DIR/params.js >/dev/null 2>&1
 ln -sf /etc/fhem.js/params.js $DIR/params.js
