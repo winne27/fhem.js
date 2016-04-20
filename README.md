@@ -18,9 +18,9 @@ Install the package with
 
     npm install -g fhem.js
 
-into directory /usr/lib/node_modules/fhem.js. All needed packages like socket.io, socket-auth and forever were automatically installed.
+All needed npm packages like socket.io, socket-auth and forever getting installed automatically by this command.
 
-Now run as root:
+Now follow the instructions made by the installation output, e.g. run:
 
     sudo /usr/lib/node_modules/fhem.js/bin/postinstall
 

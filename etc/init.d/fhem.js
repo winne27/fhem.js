@@ -14,8 +14,9 @@ NAME=fhem.js                  # Unique name for the application
 LOGFILE=/var/log/$NAME.log
 ERRORLOG=/var/log/$NAME.error
 PIDFILE=/var/run/$NAME.pid
-FOREVER=/usr/bin/forever
-FHEMJSSTART=/usr/bin/fhem.js
+BASEDIR=%basedir%
+FOREVER=$BASEDIR/bin/forever
+FHEMJSSTART=$BASEDIR/bin/fhem.js
 
 start() {
     echo "Starting $NAME node instance: "

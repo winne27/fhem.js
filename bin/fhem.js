@@ -6,7 +6,7 @@ LOGFILE=/var/log/fhem.js.log
 ERRORLOG=/var/log/fhem.js.error
 FOREVER=/usr/bin/forever
 
-while getopts "p:l:e:n:" opt; do
+while getopts "p:l:e:n:f:" opt; do
   case $opt in
     l)
       LOGFILE=$OPTARG
@@ -28,7 +28,7 @@ while getopts "p:l:e:n:" opt; do
       ;;
   esac
 done
-  
+
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
