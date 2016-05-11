@@ -4,6 +4,9 @@ exports.debug = 0;
 // port on which node.js service is reachable
 exports.nodePort = 8086;
 
+// Hostname or IP of the FHEM server
+exports.fhemHost = "127.0.0.1";
+
 // telnet port of FHEM server
 exports.fhemPort = 7072;
 

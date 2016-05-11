@@ -26,7 +26,7 @@ Now follow the instructions made by the installation output, e.g. run:
 
 This will establish the config environment in /etc/fhem.js and /etc/init.d.
 
-Have a look to /etc/fhem.js/params.js. Adjust telnet port of fhem if neccessary. Optionally set a connection password or set SSL for connections can be done there.
+Have a look to /etc/fhem.js/params.js. Adjust the hostname (default is `localhost`) and telnet port of fhem.pl if neccessary. Optionally set a connection password or set SSL for connections can be done there.
 
 Now starting the server with
 
@@ -56,9 +56,9 @@ Communication to clients with websockets were realized by the socket.io package.
 
 # Customize
 
-Adjust in params.js telnet port of fhem.pl server and port on which this server (fhem.js) is reachable.
+Adjust in params.js the hostname and telnet port of the fhem.pl server and the port on which this server (fhem.js) is reachable.
 
-The fhem.pl server must be on the same server and the telnet must be configured without local password.
+The telnet must be configured without local password.
 
 To secure the connection to this node.js server with SSL set
 

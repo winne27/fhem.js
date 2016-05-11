@@ -185,7 +185,7 @@ var defListeners = function(socket)
    socket.on('command', function(cmd,callback)
    {
       // establish telnet connection to fhem server
-      var fhemcmd = net.connect({port: params.fhemPort}, function()
+      var fhemcmd = net.connect({port: params.fhemPort, host: params.fhemHost}, function()
       {
           fhemcmd.write(cmd + ';exit\r\n');
       });
@@ -228,7 +228,7 @@ var defListeners = function(socket)
       {
          // establish telnet connection to fhem server
          mylog("request for JsonList2",1);
-         var fhemcmd = net.connect({port: params.fhemPort}, function()
+         var fhemcmd = net.connect({port: params.fhemPort, host: params.fhemHost}, function()
          {
              fhemcmd.write('JsonList2 ' + args + ';exit\r\n');
          });
@@ -261,7 +261,7 @@ var defListeners = function(socket)
    {
       mylog("commandNoResp " + data,1);
       // establish telnet connection to fhem server
-      var fhemcmd = net.connect({port: params.fhemPort}, function()
+      var fhemcmd = net.connect({port: params.fhemPort, host: params.fhemHost}, function()
       {
          fhemcmd.write(data + '\r\n');
          fhemcmd.end();
@@ -295,7 +295,7 @@ initFinished.on('true',function()
 function connectFHEMserver()
 {
    funcs.mylog("start connection to fhem server",0);
-   var trigger = net.connect({port: params.fhemPort}, function()
+   var trigger = net.connect({port: params.fhemPort, host: params.fhemHost}, function()
    {
       funcs.mylog('connected to fhem server for listen on changed values',0);
       trigger.write('inform on\r\n');
@@ -332,7 +332,7 @@ function connectFHEMserver()
 function getAllValues(type)
 {
    // establish telnet connection to fhem server
-   var fhemreq = net.connect({port: params.fhemPort}, function()
+   var fhemreq = net.connect({port: params.fhemPort, host: params.fhemHost}, function()
    {
       fhemreq.write('list;exit\r\n');
    });
@@ -409,7 +409,7 @@ function getDevice(device)
 {
    // establish telnet connection to fhem server
    mylog('get Jsonlist2 for device ' + device,1);
-   var fhemreq = net.connect({port: params.fhemPort}, function()
+   var fhemreq = net.connect({port: params.fhemPort, host: params.fhemHost}, function()
    {
       fhemreq.write('JsonList2 ' + device + ';exit\r\n');
    });
