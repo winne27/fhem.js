@@ -177,5 +177,5 @@ Java example for getAllUnitsOf (with "LightScene" as argument type):
 
 # Example
 
-The folder "test" contains a html/javascript example for an client program.
+The folder "test" contains a html/javascript example for a client program.
 
