@@ -428,7 +428,8 @@ function getDevice(device)
       answerStr = answerStr.substr(startPos,lastPos - startPos + 1);
       var deviceJSON = JSON.parse(answerStr);
       ios.sockets.in('device_all').emit('device',deviceJSON);
-      ios.sockets.in('device_' + device).emit('device',deviceJSON);
+      var deviceJSONname = 'device' + deviceJSON.Arg.replace('_','UNDERLINE');
+      ios.sockets.in(deviceJSONname).emit('device',deviceJSON);
       fhemreq.end();
       fhemreq.destroy();
    });
