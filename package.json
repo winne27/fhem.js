@@ -1,40 +1,40 @@
 {
-  "name": "fhem.js",
-  "version": "2.4.1",
-  "description": "This is a node.js server for fhem (home automation). It allows clients connecting to fhem by websockets. ",
-  "main": "server.js",
-  "bin": "./bin/fhem.js",
-  "engines" : { "node" : ">=4.0.0" },
-  "os" : [ "linux" ],
-  "dependencies": {
-    "forever": "latest",
-    "socket.io": "latest",
-    "socketio-auth": "latest"
-  },
-  "bin": {
-    "fhem.js": "./bin/fhem.js",
-    "forever": "./node_modules/forever/bin/forever"
-  },
-  "scripts": {
-    "start": "node server.js",
-    "postinstall": "./bin/postinstall.sh"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/winne27/fhem.js.git"
-  },
-  "keywords": [
-    "fhem",
-    "node.js",
-    "websockets"
-  ],
-  "author": {
-    "name": "Werner Schäffer",
-    "email": "werner@schaeffer.net",
-    "url": "https://wernerschaeffer.de"
-  },
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/winne27/fhem.js/issues"
-  }
+    "name": "fhem.js",
+    "version": "2.4.2",
+    "description": "This is a node.js server for fhem (home automation). It allows clients connecting to fhem by websockets. ",
+    "main": "server.js",
+    "bin": "./bin/fhem.js",
+    "engines": { "node": ">=4.0.0" },
+    "os": ["linux"],
+    "dependencies": {
+        "forever": "latest",
+        "socket.io": "latest",
+        "socketio-auth": "latest"
+    },
+    "bin": {
+        "fhem.js": "./bin/fhem.js",
+        "forever": "./node_modules/forever/bin/forever"
+    },
+    "scripts": {
+        "start": "node server.js",
+        "postinstall": "./bin/postinstall.sh"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/winne27/fhem.js.git"
+    },
+    "keywords": [
+        "fhem",
+        "node.js",
+        "websockets"
+    ],
+    "author": {
+        "name": "Werner Schäffer",
+        "email": "werner@schaeffer.net",
+        "url": "https://wernerschaeffer.de"
+    },
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/winne27/fhem.js/issues"
+    }
 }

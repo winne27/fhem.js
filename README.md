@@ -175,6 +175,23 @@ Java example for getAllUnitsOf (with "LightScene" as argument type):
         }
     });
 
+**On client you can listen to "version" event (only if in params.js: doCheckVersion = true)**
+
+Java example:
+
+    mySocket.socket.on("version", args -> {
+                JSONObject obj = (JSONObject) args[0];
+                try {
+                    String versionInstalled = obj.getString("installed");
+                    String versionLatest = obj.getString("latest");
+                    Boolean versionIsLatest = obj.getBoolean("isLatest");
+
+                    Log.d("version", versionInstalled + " - " + versionLatest);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            });
+
 # Example
 
 The folder "test" contains a html/javascript example for a client program.
