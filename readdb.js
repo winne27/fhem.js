@@ -5,7 +5,7 @@ var funcs   = require('./functions');
 var mylog   = funcs.mylog;
 var pw      = {};
 
-function getDBvalue(dbObj,net)
+function getDBvalue(dbObj,fhemSocket)
 {
    mylog('read ' + dbObj.column + ' from db',1);
    if (!pw[dbObj.host + '_' + dbObj.user])
@@ -27,12 +27,7 @@ function getDBvalue(dbObj,net)
       if (!err)
       {
          var value = rows[0][dbObj.column];
-         var fhemcmd = net.connect({port: params.fhemPort}, function()
-         {
-            fhemcmd.write('set ' + dbObj.fhem_name + ' ' + value + '\r\n');
-            fhemcmd.end();
-            fhemcmd.destroy();
-         });
+         fhemSocket.write('set ' + dbObj.fhem_name + ' ' + value + '\r\n');
       }
       else
       {

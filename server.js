@@ -11,6 +11,7 @@ var params = require('./params');
 var funcs = require('./functions');
 var buffer = require('./buffer');
 var eventsG = require('./events');
+var readdb = require('./readdb');
 var mylog = funcs.mylog;
 var initFinished = eventsG.initFinished;
 var exec = require('child_process').exec;
@@ -18,9 +19,14 @@ var version = new Object;
 version.installed = require('./package').version;
 version.latest = false;
 var server;
-var reconnectInterval;
+var reconnectTimeout;
 var doCheckVersion = true;
 var checkVersionInterval = 12; // in hours
+var fhemSocket;
+
+// -------------------------------------------------------------------
+// setup http(s) server
+// -------------------------------------------------------------------
 
 if (params.useSSL) {
     var https = require('https');
@@ -68,10 +74,13 @@ if (params.pathHTML) {
         response.write(params.message404);
         response.end();
     });
-
 }
 
 var ios = io(server);
+
+// -------------------------------------------------------------------
+// setup password protection
+// -------------------------------------------------------------------
 
 if (params.useClientPassword) {
     var auth = require('socketio-auth');
@@ -91,7 +100,10 @@ if (params.useClientPassword) {
     });
 }
 
-// handle for the websocket connection from client
+// -------------------------------------------------------------------
+// setup websocket server
+// -------------------------------------------------------------------
+
 ios.sockets.on('connection', function(socket) {
     var q = socket.handshake.query;
     var logmess = "client connected: " + q.client + ", " + q.model + ", " + q.platform + " " + q.version + ", App " + q.appver;
@@ -109,6 +121,10 @@ ios.sockets.on('connection', function(socket) {
         }, 100000);
     }
 });
+
+// -------------------------------------------------------------------
+// define listeners for websocket requests by clients
+// -------------------------------------------------------------------
 
 var defListeners = function(socket) {
     socket.on('getValueOnce', function(data) {
@@ -160,6 +176,7 @@ var defListeners = function(socket) {
 
     socket.on('command', function(cmd, callback) {
         // establish telnet connection to fhem server
+        mylog("request for sync command", 1);
         var fhemcmd = net.connect({ port: params.fhemPort, host: params.fhemHost }, function() {
             fhemcmd.write(cmd + ';exit\r\n');
         });
@@ -172,10 +189,9 @@ var defListeners = function(socket) {
         fhemcmd.on('end', function() {
             var arrayResp = answerStr.split("\n");
             callback(arrayResp);
-            fhemcmd.end();
-            fhemcmd.destroy();
         });
         fhemcmd.on('error', function() {
+            fhemcmd.destroy();
             funcs.mylog('error: telnet connection failed', 0);
         });
     });
@@ -211,10 +227,9 @@ var defListeners = function(socket) {
                 var answer = JSON.parse(answerStr);
                 mylog(answer, 2);
                 callback(answer);
-                fhemcmd.end();
-                fhemcmd.destroy();
             });
             fhemcmd.on('error', function() {
+                fhemcmd.destroy();
                 funcs.mylog('error: telnet connection failed', 0);
             });
         });
@@ -222,16 +237,9 @@ var defListeners = function(socket) {
 
     socket.on('commandNoResp', function(data) {
         mylog("commandNoResp " + data, 1);
-        // establish telnet connection to fhem server
-        var fhemcmd = net.connect({ port: params.fhemPort, host: params.fhemHost }, function() {
-            fhemcmd.write(data + '\r\n');
-            fhemcmd.end();
-            fhemcmd.destroy();
-        });
-        fhemcmd.on('error', function() {
-            funcs.mylog('error: telnet connection failed', 0);
-            socket.emit('fhemError');
-        });
+        if (typeof(fhemSocket) != 'undefined' && !fhemSocket.destroyed && fhemSocket.writable) {
+            fhemSocket.write(data + '\r\n');
+        }
     });
 
     socket.on('disconnect', function(data) {
@@ -243,49 +251,56 @@ var defListeners = function(socket) {
     });
 };
 
-initFinished.on('true', function() {
-    mylog('initFinished', 1);
-    server.listen(params.nodePort);
-    connectFHEMserver();
+// -------------------------------------------------------------------
+// setup permanent connection to fhem
+// -------------------------------------------------------------------
+
+fhemSocket = new net.Socket();
+process.on('uncaughtException', function(err) {
+    mylog('process error: ' + err + ' - retry in 10 secs', 0);
+});
+
+fhemSocket.on('connect', function(data) {
+    funcs.mylog('connected to fhem server for listen on changed values', 0);
+    fhemSocket.write('inform on\r\n');
+    ios.sockets.emit('fhemConn');
+});
+
+fhemSocket.on('error', function() {
+    ios.sockets.emit('fhemError');
+    mylog('error: telnet connection failed - retry in 10 secs', 0);
+    fhemSocket.destroy();
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = setTimeout(function() {
+        connectFHEMserver();
+    }, 10000);
+});
+
+fhemSocket.on('end', function() {
+    ios.sockets.emit('fhemError');
+    funcs.mylog('error: telnet connection closed - try restart in 10 secs', 0);
+    //fhemSocket.end();
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = setTimeout(function() {
+        connectFHEMserver();
+    }, 10000);
+});
+
+fhemSocket.on('data', function(data) {
+    mylog("changed data:", 2);
+    mylog(data.toString(), 2);
+    handleChangedValues(data.toString().split("\n"));
 });
 
 function connectFHEMserver() {
     funcs.mylog("start connection to fhem server", 0);
-    var trigger = net.connect({ port: params.fhemPort, host: params.fhemHost }, function() {
-        funcs.mylog('connected to fhem server for listen on changed values', 0);
-        trigger.write('inform on\r\n');
-        ios.sockets.emit('fhemConn');
-    });
-
-    trigger.on('data', function(data) {
-        mylog("changed data:", 2);
-        mylog(data.toString(), 2);
-        clearInterval(reconnectInterval);
-        handleChangedValues(data.toString().split("\n"));
-    });
-
-    process.on('uncaughtException', function(err) {
-        mylog('error: ' + err + ' - retry in 10 secs', 0);
-        reconnectInterval = setTimeout(function() {
-            connectFHEMserver();
-        }, 10000);
-    });
-
-
-    trigger.on('error', function() {
-        mylog('error: telnet connection failed - retry in 10 secs', 0);
-        reconnectInterval = setTimeout(function() {
-            connectFHEMserver();
-        }, 10000);
-    });
-
-    trigger.on('end', function() {
-        funcs.mylog('error: telnet connection closed - try restart in 10 secs', 0);
-        reconnectInterval = setTimeout(function() {
-            connectFHEMserver();
-        }, 10000);
-    });
+    clearTimeout(reconnectTimeout);
+    fhemSocket.connect({ port: params.fhemPort, host: params.fhemHost });
 }
+
+// -------------------------------------------------------------------
+// handle client get requests
+// -------------------------------------------------------------------
 
 function getAllValues(type) {
     // establish telnet connection to fhem server
@@ -303,12 +318,11 @@ function getAllValues(type) {
         if (type === 'init') {
             initFinished.emit('true');
         }
-        fhemreq.end();
-        fhemreq.destroy();
     });
 
     fhemreq.on('error', function() {
         mylog('error: telnet connection for getting values failed - retry in 10 secs', 0);
+        fhemreq.destroy();
         setTimeout(function() {
             getAllValues();
         }, 10000);
@@ -368,20 +382,29 @@ function getDevice(device) {
         ios.sockets.in('device_all').emit('device', deviceJSON);
         var deviceJSONname = 'device' + deviceJSON.Arg.replace('_', 'UNDERLINE');
         ios.sockets.in(deviceJSONname).emit('device', deviceJSON);
-        fhemreq.end();
-        fhemreq.destroy();
     });
 
     fhemreq.on('error', function() {
+        fhemreq.destroy();
         mylog('error: telnet connection for getting JsonList2 failed', 0);
     });
 }
 
+// -------------------------------------------------------------------
+// make DB requests
+// -------------------------------------------------------------------
+
 function pollDBvalue(dbObj) {
     setInterval(function() {
-        readdb.getDBvalue(dbObj, net);
+        if (typeof(fhemSocket) != 'undefined' && !fhemSocket.destroyed && fhemSocket.writable) {
+            readdb.getDBvalue(dbObj, fhemSocket);
+        }
     }, dbObj.refresh * 1000);
 }
+
+// -------------------------------------------------------------------
+// check version of fhem.js
+// -------------------------------------------------------------------
 
 function checkVersion() {
     exec('npm view fhem.js version', (error, stdout, stderr) => {
@@ -390,11 +413,12 @@ function checkVersion() {
             return;
         }
         version.latest = stdout.trim();
+        version.type = 'fhemjs';
         if (version.latest == version.installed) {
-            version.isLatest = false;
+            version.isLatest = true;
             mylog('Installed version ' + version.installed + ' is latest available version');
         } else {
-            version.isLatest = true;
+            version.isLatest = false;
             mylog('Installed version: ' + version.installed + ', available version: ' + version.latest);
         }
         emitVersion(ios.sockets);
@@ -402,45 +426,61 @@ function checkVersion() {
 }
 
 function emitVersion(sockets) {
-    if (!version.latest) return;
+    if (version.isLatest) return;
 
     sockets.emit('version', version);
 }
-// ----- Main -------------------
 
-getAllValues('init');
+// -------------------------------------------------------------------
+// init somwe things
+// -------------------------------------------------------------------
+function init() {
 
-setInterval(function() {
-    getAllValues('refresh');
-}, params.pollForAllDevices * 1000);
+    setInterval(function() {
+        getAllValues('refresh');
+    }, params.pollForAllDevices * 1000);
 
-if (params.readDB) {
-    var readdb = require('./readdb');
-    for (var i in params.readDBvalues) {
-        var dbObj = params.readDBvalues[i];
-        pollDBvalue(dbObj);
+    if (params.readDB) {
+        var readdb = require('./readdb');
+        for (var i in params.readDBvalues) {
+            var dbObj = params.readDBvalues[i];
+            pollDBvalue(dbObj);
+        }
+    }
+
+    // check for new version every 12 hours
+
+    if (typeof(params.doCheckVersion) != 'undefined') {
+        doCheckVersion = params.doCheckVersion;
+    }
+
+    if (typeof(params.checkVersionInterval) != 'undefined') {
+        checkVersionInterval = params.checkVersionInterval;
+    }
+
+    if (doCheckVersion) {
+        setInterval(function() {
+            checkVersion();
+        }, checkVersionInterval * 60 * 60 * 1000);
+
+        // check for new version 60 seconds after start
+        setTimeout(function() {
+            checkVersion();
+        }, 20000);
     }
 }
 
-// check for new version every 12 hours
+// -------------------------------------------------------------------
+// main
+// -------------------------------------------------------------------
 
-if (typeof(params.doCheckVersion) != 'undefined') {
-    doCheckVersion = params.doCheckVersion;
-} 
-if (typeof(params.checkVersionInterval) != 'undefined') {
-    checkVersionInterval = params.checkVersionInterval;
-} 
+getAllValues('init');
 
-if (doCheckVersion) {
-    setInterval(function() {
-        checkVersion();
-    }, checkVersionInterval * 60 * 60 * 1000);
-
-    // check for new version 60 seconds after start
-    setTimeout(function() {
-        checkVersion();
-    }, 60000);
-}
-var messSuff = (params.useSSL) ? 'with SSL' : 'without SSL';
-
-mylog('Server Version ' + version.installed + ' started ' + messSuff, 0);
+initFinished.on('true', function() {
+    mylog('initFinished', 1);
+    server.listen(params.nodePort);
+    var messSuff = (params.useSSL) ? ' with SSL' : ' without SSL';
+    mylog('listen for websocket requests on port ' + params.nodePort + messSuff);
+    connectFHEMserver();
+    init();
+});
