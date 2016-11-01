@@ -118,7 +118,7 @@ ios.sockets.on('connection', function(socket) {
     if (doCheckVersion) {
         setTimeout(function() {
             emitVersion(socket);
-        }, 100000);
+        }, 20000);
     }
 });
 
@@ -427,7 +427,6 @@ function checkVersion() {
 
 function emitVersion(sockets) {
     if (version.isLatest) return;
-
     sockets.emit('version', version);
 }
 
@@ -466,7 +465,7 @@ function init() {
         // check for new version 60 seconds after start
         setTimeout(function() {
             checkVersion();
-        }, 20000);
+        }, 10000);
     }
 }
 
