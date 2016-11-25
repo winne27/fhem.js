@@ -1,5 +1,5 @@
 /*
- ** use this script with socket-auth Version 0.0.4 and newer  
+ ** use this script with socket-auth Version 0.0.4 and newer
  */
 var url = require('url');
 var fs = require('fs');
@@ -20,9 +20,9 @@ version.installed = require('./package').version;
 version.latest = false;
 var server;
 var reconnectTimeout;
-var doCheckVersion = true;
 var checkVersionInterval = 12; // in hours
 var fhemSocket;
+var tagsFilterOut;
 
 // -------------------------------------------------------------------
 // setup http(s) server
@@ -115,7 +115,7 @@ ios.sockets.on('connection', function(socket) {
         socket.emit('authenticated');
     }
     defListeners(socket);
-    if (doCheckVersion) {
+    if (params.doCheckVersion) {
         setTimeout(function() {
             emitVersion(socket);
         }, 20000);
@@ -139,14 +139,14 @@ var defListeners = function(socket) {
     socket.on('getValueOnChange', function(data) {
         mylog("request for getValueOnChange " + data, 1);
         if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
-            socket.join(data.replace('_', 'UNDERLINE'));
+            socket.join(data.replace(/_/g, 'UNDERLINE'));
         }
     });
 
     socket.on('getDeviceOnChange', function(data) {
         mylog("request for getDeviceOnChange " + data, 1);
         if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
-            socket.join('device' + data.replace('_', 'UNDERLINE'));
+            socket.join('device' + data.replace(/_/g, 'UNDERLINE'));
         }
     });
 
@@ -334,16 +334,29 @@ function handleChangedValues(allLines) {
     var devices = [];
     var device_old = '';
     allLines.forEach(function(line) {
-        line = line.trim().split(' ');
-        if (line.length > 1) {
-            var device = line[1];
-            if (device === 'global' && line.length > 3) {
-                device = line[3];
+        // ignore lines with html tag
+        if (line.search("/<html>/") > -1) return;
+
+        var lineparts = line.trim().split(' ');
+        if (lineparts.length > 1) {
+            var device = lineparts[1];
+            if (device === 'global' && lineparts.length > 3) {
+                device = lineparts[3];
             }
-            if (line.length === 3) {
-                if (buffer.setActValue(device, line[2])) {
+            if (lineparts.length > 2) {
+
+                // ignore values containing tags out of params.filterOutTags
+                if (params.filterOutTags.indexOf(lineparts[2]) > -1) {
+                    return;
+                }
+
+                lineparts.shift();
+                lineparts.shift();
+                var value = lineparts.join(' ');
+                if (buffer.setActValue(device, value)) {
                     var jsonValue = buffer.checkValue(device);
-                    var device2 = device.replace('_', 'UNDERLINE');
+                    var device2 = device.replace(/_/g, 'UNDERLINE');
+                    //console.log(ios.sockets.adapter.rooms);
                     ios.sockets.in(device2).emit("value", jsonValue);
                     ios.sockets.in("all").emit("value", jsonValue);
                 }
@@ -380,7 +393,7 @@ function getDevice(device) {
         answerStr = answerStr.substr(startPos, lastPos - startPos + 1);
         var deviceJSON = JSON.parse(answerStr);
         ios.sockets.in('device_all').emit('device', deviceJSON);
-        var deviceJSONname = 'device' + deviceJSON.Arg.replace('_', 'UNDERLINE');
+        var deviceJSONname = 'device' + deviceJSON.Arg.replace(/_/g, 'UNDERLINE');
         ios.sockets.in(deviceJSONname).emit('device', deviceJSON);
     });
 
@@ -407,6 +420,7 @@ function pollDBvalue(dbObj) {
 // -------------------------------------------------------------------
 
 function checkVersion() {
+    mylog("checkVersion started", 1);
     exec('npm view fhem.js version', (error, stdout, stderr) => {
         if (error) {
             console.error(`exec error: ${error}`);
@@ -447,25 +461,19 @@ function init() {
         }
     }
 
-    // check for new version every 12 hours
+    // check for new version every params.checkVersionInterval hours
 
-    if (typeof(params.doCheckVersion) != 'undefined') {
-        doCheckVersion = params.doCheckVersion;
-    }
-
-    if (typeof(params.checkVersionInterval) != 'undefined') {
-        checkVersionInterval = params.checkVersionInterval;
-    }
-
-    if (doCheckVersion) {
+    if (params.doCheckVersion) {
+        var checkVersionIntervalMs = params.checkVersionInterval * 60 * 60 * 1000;
+        mylog("versionCheck after " + checkVersionIntervalMs, 1);
         setInterval(function() {
             checkVersion();
-        }, checkVersionInterval * 60 * 60 * 1000);
+        }, checkVersionIntervalMs);
 
         // check for new version 60 seconds after start
         setTimeout(function() {
             checkVersion();
-        }, 10000);
+        }, 60000);
     }
 }
 

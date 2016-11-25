@@ -26,14 +26,30 @@ fi
 
 cp -r etc/fhem.js/* /etc/fhem.js/
 
-cp $DIR/etc/init.d/fhem.js /etc/init.d/fhem.js
+startscript=/etc/init.d/fhem.js
+if [ -f $startscript ]
+then
+    cp $DIR/etc/init.d/fhem.js $startscript.dist
+else
+    cp $DIR/etc/init.d/fhem.js $startscript.dist
+    cp $DIR/etc/init.d/fhem.js $startscript
+    chmod +x $startscript
+fi
 
 sed -i s#%basedir%#$BASEDIR#g /etc/init.d/fhem.js
 
-if [ ! -f /etc/fhem.js/params.js ]
+params=/etc/fhem.js/params.js
+if [ ! -f $params ]
 then
-   cp /etc/fhem.js/params.js.dist /etc/fhem.js/params.js
+    cp /etc/fhem.js/params.js.dist $params
+else
+    sed -i 's/\r//g' $params
+    if !( grep -q 'new for 2.4.7' $params )
+    then
+        cat /etc/fhem.js/params.new.2.4.7.dist >> /etc/fhem.js/params.js
+    fi
 fi
+
 
 rm $DIR/params.js >/dev/null 2>&1
 ln -sf /etc/fhem.js/params.js $DIR/params.js

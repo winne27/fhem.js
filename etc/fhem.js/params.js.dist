@@ -79,8 +79,12 @@ exports.readDBvalues =
 
 exports.message404 = '<html><head><title>404 Not Found</title></head><body bgcolor="white"><center><h1>404 Not Found</h1></center></body></html>';
 
+//------ NEW PARAMS 2.4.7 ------
+
 // do version check for fhem.js after every defined interval
 // the result of this check is written to the log and emitted with tag "version" to all connected clients
+exports.doCheckVersion = true;
+exports.checkVersionInterval = 12;  // in hours
 
-exports.doVersionCheck = true;
-exports.versionCheckInterval = 12;  // in hours
+// filter out device values that containing following tag:
+exports.filterOutTags = ['deviceMsg:', 'pct:', 'level:', 'timedOn:', 'desired-temp:'];
