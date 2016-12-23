@@ -178,6 +178,7 @@ var defListeners = function(socket) {
     });
 
     socket.on('refreshValues', function(data) {
+        mylog("request for refreshValues", 1);
         getAllValues('refresh');
     });
 
