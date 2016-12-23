@@ -2,24 +2,19 @@ var events = require('./events');
 var funcs = require('./functions');
 var mylog = funcs.mylog;
 var initFinished = events.initFinished;
-var aktValues = {
-};
-var aktTypes = {
-};
+var aktValues = {};
+var aktTypes = {};
 
 function readValues(data)
 {
-    var newValues = {
-    };
-    var newTypes = {
-    };
+    var newValues = {};
+    var newTypes = {};
     var lastHeader;
     var allLines = data.toString().split("\n");
 
     var selLines =[];
     var ln = 0;
-    allLines.forEach(function (line)
-        {
+    allLines.forEach(function (line) {
             line = line.trim();
 
             // ignore empty lines

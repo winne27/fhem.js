@@ -164,6 +164,10 @@ var defListeners = function(socket) {
         }
     });
 
+    socket.on('refreshValues', function(data) {
+        getAllValues('refresh');
+    });
+
     socket.on('getAllValues', function(callback) {
         mylog("request for getAllValues", 1);
         if (!params.useClientPassword || socket.auth) {
