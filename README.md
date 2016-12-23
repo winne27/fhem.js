@@ -78,6 +78,10 @@ Establish connection to node.js server by:
      socket = IO.socket(url, options);        
      socket.connect();
 
+**On client you can emit the following requests (without response):**
+
+  * 'refreshValues'        : structuaral changes in fhem are polled by fhem.js every 10 minutes. The refresh can forced by this request.
+
 **On client you can emit the following async requests (fast response with minimized data):**
 
   * 'getValueOnce'         : requests a value from fhem once
