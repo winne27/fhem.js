@@ -1,0 +1,9 @@
+
+// -------------------------------------------------------------
+// new for 2.4.11 <-- please don't change or delete this line
+// -------------------------------------------------------------
+
+// if fhem.js is running as non-root, nodePort must be greater than 1000
+
+// if fhem.js is running as non-root and useSSL is set to true, make sure that the non-root user has read access
+// to the files defined in param sslcert above;

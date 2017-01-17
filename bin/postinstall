@@ -1,13 +1,43 @@
 #!/bin/bash
 
+ps -ef | grep fhem.js | grep -v grep >/dev/null 2>&1
+if [ $?  -eq "0" ]
+then
+    service fhem.js stop
+fi
+
+echo
+read -p "User for running fhem.js (fhem)? " USER
+
+[ -z "$USER" ] && USER="fhem"
+
+if id "$USER" >/dev/null 2>&1; then
+        echo
+        echo "ok, user is valid"
+        echo
+else
+        echo
+        echo ------------------------------------------------
+        echo "User does not exist. Check and try again with command:"
+        echo "sudo npm run postinstall"
+        echo ------------------------------------------------
+        echo
+        exit;
+fi
+
 SOURCE="${BASH_SOURCE[0]}"
-DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+SOURCEDIR=`cd -P \`dirname "$SOURCE"\` && pwd`
+PACKAGEDIR=${SOURCEDIR%/*}
+BASEDIR=${PACKAGEDIR%/*/*/*}
 
-cd  $DIR/../../../..
-BASEDIR=`pwd`
+PIDDIR=/var/run/$USER
 
-cd $DIR/..
-DIR=`pwd`
+## define directory for pid
+if [ ! -d $PIDDIR ]
+then
+   mkdir -p $PIDDIR
+fi
+chown $USER $PIDDIR
 
 if [ ! -d /etc/fhem.js ]
 then
@@ -25,16 +55,19 @@ then
 fi
 
 cp -r etc/fhem.js/* /etc/fhem.js/
+cat /etc/fhem.js/params.new.*.dist >> /etc/fhem.js/params.js.dist
 
 startscript=/etc/init.d/fhem.js
 if [ -f $startscript ]
 then
-    cp $DIR/etc/init.d/fhem.js $startscript.dist
-else
-    cp $DIR/etc/init.d/fhem.js $startscript.dist
-    cp $DIR/etc/init.d/fhem.js $startscript
-    chmod +x $startscript
+    cp $PACKAGEDIR/etc/init.d/fhem.js $startscript.old
 fi
+
+cp $PACKAGEDIR/etc/init.d/fhem.js $startscript.dist
+
+cp $PACKAGEDIR/etc/init.d/fhem.js $startscript
+chmod +x $startscript
+sed -i "s/USER=xxxx/USER=$USER/" $startscript
 
 sed -i s#%basedir%#$BASEDIR#g /etc/init.d/fhem.js
 
@@ -48,8 +81,18 @@ else
     then
         cat /etc/fhem.js/params.new.2.4.7.dist >> /etc/fhem.js/params.js
     fi
+
+    if !( grep -q 'new for 2.4.11' $params )
+    then
+        cat /etc/fhem.js/params.new.2.4.11.dist >> /etc/fhem.js/params.js
+        cat /etc/fhem.js/params.new.2.4.11.dist
+        echo
+    fi
 fi
 
+rm $PACKAGEDIR/params.js >/dev/null 2>&1
+ln -sf /etc/fhem.js/params.js $PACKAGEDIR/params.js
 
-rm $DIR/params.js >/dev/null 2>&1
-ln -sf /etc/fhem.js/params.js $DIR/params.js
+touch /var/log/fhem.js.log
+touch /var/log/fhem.js.error
+chown $USER /var/log/fhem.js.*

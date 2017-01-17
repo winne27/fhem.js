@@ -2,7 +2,7 @@
 #  
 ### BEGIN INIT INFO
 # Provides: fhem.js
-# description:  fhem.js init.d example 
+# description:  fhem.js init.d example
 # Required-Start: $local_fs $remote_fs $network $syslog 
 # Required-Stop:
 # Default-Start: 2 3 4 5
@@ -10,10 +10,11 @@
 #
 ### END INIT INFO
 
+USER=xxxx
 NAME=fhem.js                  # Unique name for the application
 LOGFILE=/var/log/$NAME.log
 ERRORLOG=/var/log/$NAME.error
-PIDFILE=/var/run/$NAME.pid
+PIDFILE=/var/run/$USER/$NAME.pid
 BASEDIR=%basedir%
 FOREVER=$BASEDIR/bin/forever
 FHEMJSSTART=$BASEDIR/bin/fhem.js
@@ -21,18 +22,18 @@ FHEMJSSTART=$BASEDIR/bin/fhem.js
 start() {
     echo "Starting $NAME node instance: "
 
-    $FHEMJSSTART -n $NAME -l $LOGFILE -e $ERRORFILE -p $PIDFILE -f $FOREVER
+    sudo -u $USER $FHEMJSSTART -n $NAME -l $LOGFILE -e $ERRORLOG -p $PIDFILE -f $FOREVER
     RETVAL=$?
 }
 
 restart() {
     echo -n "Restarting $NAME node instance : "
-    $FOREVER restart $NAME
+    sudo -u $USER $FOREVER restart $NAME
     RETVAL=$?
 }
 
 stop() {
-    $FOREVER stop $NAME
+    sudo -u $USER $FOREVER stop $NAME
     RETVAL=$?
 }
 
@@ -44,7 +45,7 @@ case "$1" in
         stop
         ;;
     status)
-       $FOREVER list
+       sudo -u $USER $FOREVER list
        RETVAL=$?
         ;;
     restart)

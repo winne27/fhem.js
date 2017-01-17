@@ -151,15 +151,19 @@ var defListeners = function(socket) {
 
     socket.on('getValueOnChange', function(data) {
         mylog("request for getValueOnChange " + data, 1);
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
-            socket.join(data.replace(/_/g, 'UNDERLINE'));
+        //var dataMasked = data.replace(/_/g, 'UNDERLINE');
+        var dataMasked = data;
+        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
+            socket.join(dataMasked);
         }
     });
 
     socket.on('getDeviceOnChange', function(data) {
         mylog("request for getDeviceOnChange " + data, 1);
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
-            socket.join('device' + data.replace(/_/g, 'UNDERLINE'));
+        //var dataMasked = 'device' + data.replace(/_/g, 'UNDERLINE');
+        var dataMasked = data;
+        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
+            socket.join(dataMasked);
         }
     });
 
@@ -374,6 +378,7 @@ function handleChangedValues(allLines) {
                 if (buffer.setActValue(device, value)) {
                     var jsonValue = buffer.checkValue(device);
                     var device2 = device.replace(/_/g, 'UNDERLINE');
+                    var device2 = device;
                     //console.log(ios.sockets.adapter.rooms);
                     ios.sockets.in(device2).emit("value", jsonValue);
                     ios.sockets.in("all").emit("value", jsonValue);
@@ -412,6 +417,7 @@ function getDevice(device) {
         var deviceJSON = JSON.parse(answerStr);
         ios.sockets.in('device_all').emit('device', deviceJSON);
         var deviceJSONname = 'device' + deviceJSON.Arg.replace(/_/g, 'UNDERLINE');
+        var deviceJSONname = 'device' + deviceJSON.Arg;
         ios.sockets.in(deviceJSONname).emit('device', deviceJSON);
     });
 

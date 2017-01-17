@@ -14,17 +14,21 @@ Install first node.js on the server on which fhem is installed. Ensure that the 
 
 Ensure that telnet is enabled on the standard fhem server.
 
-Install the package with
+For installation of this package two posibilities exists:
 
-    npm install -g fhem.js
+A - If you trust fhem.js install the package with
 
-All needed npm packages like socket.io, socket-auth and forever getting installed automatically by this command.
+    sudo npm install --unsafe-perm -g fhem.js
 
-Now follow the instructions made by the installation output, e.g. run:
+B - If you don't like options like unsafe-perm install the package without the option --unsafe-perm.
+For that you will get some permission error messages at the end of the installation. Now you can check the postinstall script
+in the node.js directory (e.g. /usr/lib/nodemodules/fhem.js/bin) for bad code and finish installation or update by
 
-    sudo /usr/lib/node_modules/fhem.js/bin/postinstall
+    sudo npm run postinstall
 
-This will establish the config environment in /etc/fhem.js and /etc/init.d.
+All needed npm packages like socket.io, socket-auth and forever will be installed automatically.
+The post installation process prompts for a unix user with wich fhem.js should run. The default is fhem. This user must exist before starting installation.
+
 
 Have a look to /etc/fhem.js/params.js. Adjust the hostname (default is `localhost`) and telnet port of fhem.pl if neccessary. Optionally set a connection password or set SSL for connections can be done there.
 

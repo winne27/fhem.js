@@ -1,10 +1,14 @@
 #!/bin/bash
- 
+SOURCE="${BASH_SOURCE[0]}"
+PATH="$(dirname $SOURCE)"
+PREFIX="$(dirname $PATH)"
+PACKPATH=$PREFIX/lib/node_modules/fhem.js
+
 NAME=fhem.js
-PIDFILE=/var/run/fhem.js.pid
+PIDFILE=/var/run/fhem/fhem.js.pid
 LOGFILE=/var/log/fhem.js.log
 ERRORLOG=/var/log/fhem.js.error
-FOREVER=/usr/bin/forever
+FOREVER=$PATH/forever
 
 while getopts "p:l:e:n:f:" opt; do
   case $opt in
@@ -29,14 +33,4 @@ while getopts "p:l:e:n:f:" opt; do
   esac
 done
 
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-cd $DIR/..
-DIR=`pwd`
-
-$FOREVER start --uid "$NAME" --pidFile /var/run/fhem.js.pid -e /var/log/fhem.js.error -l /var/log/fhem.js.log -a --workingDir $DIR  $DIR
+$FOREVER start --uid "$NAME" --pidFile $PIDFILE -e $ERRORLOG -l $LOGFILE -a --workingDir $PACKPATH $PACKPATH/server.js
