@@ -1,6 +1,6 @@
 {
     "name": "fhem.js",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "description": "This is a node.js server for fhem (home automation). It allows clients connecting to fhem by websockets. ",
     "main": "server.js",
     "bin": "./bin/fhem.js",

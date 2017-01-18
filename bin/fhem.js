@@ -1,14 +1,13 @@
 #!/bin/bash
-SOURCE="${BASH_SOURCE[0]}"
-PATH="$(dirname $SOURCE)"
-PREFIX="$(dirname $PATH)"
+PREFIX=%PREFIX%
+BINPATH=$PREFIX/bin
 PACKPATH=$PREFIX/lib/node_modules/fhem.js
 
 NAME=fhem.js
 PIDFILE=/var/run/fhem/fhem.js.pid
 LOGFILE=/var/log/fhem.js.log
 ERRORLOG=/var/log/fhem.js.error
-FOREVER=$PATH/forever
+FOREVER=$BINPATH/forever
 
 while getopts "p:l:e:n:f:" opt; do
   case $opt in

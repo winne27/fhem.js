@@ -10,14 +10,14 @@
 #
 ### END INIT INFO
 
-USER=xxxx
+USER=%USER%
 NAME=fhem.js                  # Unique name for the application
 LOGFILE=/var/log/$NAME.log
 ERRORLOG=/var/log/$NAME.error
 PIDFILE=/var/run/$USER/$NAME.pid
-BASEDIR=%basedir%
-FOREVER=$BASEDIR/bin/forever
-FHEMJSSTART=$BASEDIR/bin/fhem.js
+PREFIX=%PREFIX%
+FOREVER=$PREFIX/bin/forever
+FHEMJSSTART=$PREFIX/bin/fhem.js
 
 start() {
     echo "Starting $NAME node instance: "

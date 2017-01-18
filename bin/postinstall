@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ps -ef | grep fhem.js | grep -v grep >/dev/null 2>&1
-if [ $?  -eq "0" ]
+if [ $? -eq "0" ]
 then
-    service fhem.js stop
+    service fhem.js stop > /dev/null 2>&1
 fi
 
 echo
@@ -25,10 +25,13 @@ else
         exit;
 fi
 
-SOURCE="${BASH_SOURCE[0]}"
-SOURCEDIR=`cd -P \`dirname "$SOURCE"\` && pwd`
+###SOURCE="${BASH_SOURCE[0]}"
+###SOURCEDIR=`cd -P \`dirname "$SOURCE"\` && pwd`
+
+SOURCEDIR=$( cd ${0%/*} && pwd -P )
+
 PACKAGEDIR=${SOURCEDIR%/*}
-BASEDIR=${PACKAGEDIR%/*/*/*}
+PREFIX=${PACKAGEDIR%/*/*/*}
 
 PIDDIR=/var/run/$USER
 
@@ -57,19 +60,20 @@ fi
 cp -r etc/fhem.js/* /etc/fhem.js/
 cat /etc/fhem.js/params.new.*.dist >> /etc/fhem.js/params.js.dist
 
-startscript=/etc/init.d/fhem.js
-if [ -f $startscript ]
+STARTSCRIPT=/etc/init.d/fhem.js
+if [ -f $STARTSCRIPT ]
 then
-    cp $PACKAGEDIR/etc/init.d/fhem.js $startscript.old
+    cp $PACKAGEDIR/etc/init.d/fhem.js $STARTSCRIPT.old
 fi
 
-cp $PACKAGEDIR/etc/init.d/fhem.js $startscript.dist
+cp $PACKAGEDIR/etc/init.d/fhem.js $STARTSCRIPT.dist
 
-cp $PACKAGEDIR/etc/init.d/fhem.js $startscript
-chmod +x $startscript
-sed -i "s/USER=xxxx/USER=$USER/" $startscript
+cp $PACKAGEDIR/etc/init.d/fhem.js $STARTSCRIPT
+chmod +x $STARTSCRIPT
+sed -i "s/%USER%/$USER/" $STARTSCRIPT
 
-sed -i s#%basedir%#$BASEDIR#g /etc/init.d/fhem.js
+sed -i s#%PREFIX%#$PREFIX#g /etc/init.d/fhem.js
+sed -i s#%PREFIX%#$PREFIX#g $PREFIX/bin/fhem.js
 
 params=/etc/fhem.js/params.js
 if [ ! -f $params ]

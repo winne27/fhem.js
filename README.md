@@ -22,7 +22,7 @@ A - If you trust fhem.js install the package with
 
 B - If you don't like options like unsafe-perm install the package without the option --unsafe-perm.
 For that you will get some permission error messages at the end of the installation. Now you can check the postinstall script
-in the node.js directory (e.g. /usr/lib/nodemodules/fhem.js/bin) for bad code and finish installation or update by
+in the node.js directory (e.g. /usr/(local/)lib/nodemodules/fhem.js/bin) for bad code and finish installation or update by
 
     sudo npm run postinstall
 
