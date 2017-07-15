@@ -368,7 +368,7 @@ function handleChangedValues(allLines) {
             if (lineparts.length > 2) {
 
                 // ignore values containing tags out of params.filterOutTags
-                if (params.filterOutTags.indexOf(lineparts[2]) > -1) {
+                if (params.filterOutTags && params.filterOutTags.indexOf(lineparts[2]) > -1) {
                     return;
                 }
 
