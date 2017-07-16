@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo $npm_config_argv | grep -e \-\-unsafe_perm  > /dev/null
+echo $npm_config_argv | grep -e \-\-unsafe-perm  > /dev/null
 if [ $? -eq "0" ] || [ -z "$npm_config_argv" ]
 then
     ps -ef | grep fhem.js | grep -v grep >/dev/null 2>&1
