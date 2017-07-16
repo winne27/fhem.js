@@ -57,7 +57,7 @@ then
    rm /etc/fhem.js/params.js.dist
 fi
 
-cp -r etc/fhem.js/* /etc/fhem.js/
+cp -r $PACKAGEDIR/etc/fhem.js/* /etc/fhem.js/
 cat /etc/fhem.js/params.new.*.dist >> /etc/fhem.js/params.js.dist
 
 STARTSCRIPT=/etc/init.d/fhem.js
