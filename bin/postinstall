@@ -79,19 +79,19 @@ params=/etc/fhem.js/params.js
 if [ ! -f $params ]
 then
     cp /etc/fhem.js/params.js.dist $params
-else
-    sed -i 's/\r//g' $params
-    if !( grep -q 'new for 2.4.7' $params )
-    then
-        cat /etc/fhem.js/params.new.2.4.7.dist >> /etc/fhem.js/params.js
-    fi
+fi
 
-    if !( grep -q 'new for 2.4.11' $params )
-    then
-        cat /etc/fhem.js/params.new.2.4.11.dist >> /etc/fhem.js/params.js
-        cat /etc/fhem.js/params.new.2.4.11.dist
-        echo
-    fi
+sed -i 's/\r//g' $params
+if !( grep -q 'new for 2.4.7' $params )
+then
+    cat /etc/fhem.js/params.new.2.4.7.dist >> /etc/fhem.js/params.js
+fi
+
+if !( grep -q 'new for 2.4.11' $params )
+then
+    cat /etc/fhem.js/params.new.2.4.11.dist >> /etc/fhem.js/params.js
+    cat /etc/fhem.js/params.new.2.4.11.dist
+    echo
 fi
 
 rm $PACKAGEDIR/params.js >/dev/null 2>&1
