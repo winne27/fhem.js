@@ -21,10 +21,14 @@ A - If you trust fhem.js install the package with
     sudo npm install --unsafe-perm -g fhem.js
 
 B - If you don't like options like unsafe-perm install the package without the option --unsafe-perm.
+
+    sudo npm install -g fhem.js
+
 For that you will get some permission error messages at the end of the installation. Now you can check the postinstall script
 in the node.js directory (e.g. /usr/(local/)lib/node_modules/fhem.js/bin) for bad code and finish or update installation by
 
-    sudo npm run postinstall
+    sudo %nodelib%/fhem.js/bin/postinstall
+    e.g. sudo /usr/lib/node_modules/fhem.js/bin/postinstall
 
 All needed npm packages like socket.io, socket-auth and forever will be installed automatically.
 The post installation process prompts for a unix user with wich fhem.js should run. The default is fhem. This user must exist before starting installation.
