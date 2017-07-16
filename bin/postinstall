@@ -100,3 +100,4 @@ ln -sf /etc/fhem.js/params.js $PACKAGEDIR/params.js
 touch /var/log/fhem.js.log
 touch /var/log/fhem.js.error
 chown $USER /var/log/fhem.js.*
+chown -R $USER /etc/fhem.js
