@@ -22,7 +22,7 @@ then
             echo
             echo ------------------------------------------------
             echo "User does not exist. Check and try again with command:"
-            echo "sudo npm run postinstall"
+            echo sudo $DIR/postinstall.sh
             echo ------------------------------------------------
             echo
             exit;
@@ -112,7 +112,7 @@ else
     echo "************************************"
     echo "finish installation by running:"
     echo
-    echo  sudo $DIR/postinstall
+    echo  sudo $DIR/postinstall.sh
     echo
     echo "This puts configuration into folder /etc/fhem.js"
     echo  "************************************"
