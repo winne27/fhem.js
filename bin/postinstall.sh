@@ -36,15 +36,28 @@ then
     PACKAGEDIR=${SOURCEDIR%/*}
     PREFIX=${PACKAGEDIR%/*/*/*}
 
-    PIDDIR=/var/run/$USER
 
     ## define directory for pid
+
+    PIDDIR=/run/$USER
     if [ ! -d $PIDDIR ]
     then
        mkdir -p $PIDDIR
     fi
     chown $USER $PIDDIR
 
+	## recreate directory for pid after restart with systemd 
+	
+    PIDDIRCONF=/usr/lib/tmpfiles.d/fhem.conf
+    if [ -d /usr/lib/tmpfiles.d ]
+    then
+		if [ ! -f $PIDDIRCONF ]
+	    then
+	       echo "/run/fhem 0755 $USER root - -" > $PIDDIRCONF 
+	    fi
+	fi
+
+	##	
     if [ ! -d /etc/fhem.js ]
     then
        mkdir /etc/fhem.js
