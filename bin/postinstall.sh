@@ -53,7 +53,7 @@ then
     then
 		if [ ! -f $PIDDIRCONF ]
 	    then
-	       echo "/run/fhem 0755 $USER root - -" > $PIDDIRCONF 
+	       echo "d /run/fhem 0755 $USER root - -" > $PIDDIRCONF 
 	    fi
 	fi
 
@@ -116,7 +116,6 @@ then
     touch /var/log/fhem.js.log
     touch /var/log/fhem.js.error
     chown $USER /var/log/fhem.js.*
-    chown -R $USER /etc/fhem.js
 else
     SOURCE="${BASH_SOURCE[0]}"
     DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
