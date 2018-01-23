@@ -19,14 +19,13 @@ var fs = require('fs');
 var io = require('socket.io');
 var net = require('net');
 var crypto = require('crypto');
-var events = require('events');
+var events = require('./events');
 var params = require('./params');
 var funcs = require('./functions');
 var buffer = require('./buffer');
-var eventsG = require('./events');
 if (params.readDB) var readdb = require('./readdb');
 var mylog = funcs.mylog;
-var initFinished = eventsG.initFinished;
+var initFinished = events.initFinished;
 var exec = require('child_process').exec;
 var version = new Object;
 version.installed = require('./package').version;
@@ -36,6 +35,8 @@ var reconnectTimeout;
 var checkVersionInterval = 12; // in hours
 var fhemSocket;
 var tagsFilterOut;
+var initCompleteCount = 0;
+var initCompleteMax = 2;
 
 // -------------------------------------------------------------------
 // setup http(s) server
@@ -196,6 +197,26 @@ var defListeners = function(socket) {
         }
     });
 
+    socket.on('getReadingOnChange', function(data) {
+        mylog("request for getReadingOnChange " + data.unit + ' ' + data.reading, 0);
+        var room = data.unit + 'READING' + data.reading;
+        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[room]) == 'undefined') {
+            socket.join(room);
+        }
+    });
+    
+    socket.on('getReadingOnce', function(data) {
+    	mylog("request for getReading " + data.unit + ' ' + data.reading, 1);
+    	if (buffer.jsonBuffer[data.unit][data.reading]) {
+    		var response = {
+    				unit: data.unit,
+    				reading: data.reading,
+    				value: buffer.jsonBuffer[data.unit][data.reading]
+    		};
+    		socket.emit('reading', response);
+    	}
+    });
+    
     socket.on('command', function(cmd, callback) {
         // establish telnet connection to fhem server
         mylog("request for sync command", 1);
@@ -368,20 +389,18 @@ function handleChangedValues(allLines) {
             if (lineparts.length > 2) {
 
                 // ignore values containing tags out of params.filterOutTags
-                if (params.filterOutTags && params.filterOutTags.indexOf(lineparts[2]) > -1) {
-                    return;
-                }
-
-                lineparts.shift();
-                lineparts.shift();
-                var value = lineparts.join(' ');
-                if (buffer.setActValue(device, value)) {
-                    var jsonValue = buffer.checkValue(device);
-                    var device2 = device.replace(/_/g, 'UNDERLINE');
-                    var device2 = device;
-                    //console.log(ios.sockets.adapter.rooms);
-                    ios.sockets.in(device2).emit("value", jsonValue);
-                    ios.sockets.in("all").emit("value", jsonValue);
+                if (!(params.filterOutTags && params.filterOutTags.indexOf(lineparts[2]) > -1)) {
+	                lineparts.shift();
+	                lineparts.shift();
+	                var value = lineparts.join(' ');
+	                if (buffer.setActValue(device, value)) {
+	                    var jsonValue = buffer.checkValue(device);
+	                    //var device2 = device.replace(/_/g, 'UNDERLINE');
+	                    var device2 = device;
+	                    //console.log(ios.sockets.adapter.rooms);
+	                    ios.sockets.in(device2).emit("value", jsonValue);
+	                    ios.sockets.in("all").emit("value", jsonValue);
+	                }
                 }
             }
             if (device_old !== device) {
@@ -389,7 +408,33 @@ function handleChangedValues(allLines) {
                 device_old = device;
             }
         }
+        // Readings
+        var lineparts = line.trim().split(' ');
+        if (lineparts.length > 3) {
+        	var unit = lineparts[1];
+        	var reading = lineparts[2];
+        	if (reading.substr(-1, 1) == ':') {
+        		reading = reading.substr(0,reading.length - 1);
+        		if (buffer.jsonBuffer[unit][reading]) {
+	        		lineparts.shift();
+	                lineparts.shift();
+	                lineparts.shift();
+	                var value = lineparts.join(' ');
+	                if (buffer.jsonBuffer[unit][reading] != value) {
+	                	var response = {
+	                		unit: unit,
+	                		reading: reading,
+	                		value: value
+	                	};
+	                	var room = unit + 'READING' + reading;
+	                	ios.sockets.in(room).emit("reading", response);
+	                	buffer.jsonBuffer[unit][reading] = value;
+	                }
+        		}
+        	}
+        }
     });
+
     if (params.extendedMode) {
         for (var index in devices) {
             getDevice(devices[index]);
@@ -416,7 +461,7 @@ function getDevice(device) {
         answerStr = answerStr.substr(startPos, lastPos - startPos + 1);
         var deviceJSON = JSON.parse(answerStr);
         ios.sockets.in('device_all').emit('device', deviceJSON);
-        var deviceJSONname = 'device' + deviceJSON.Arg.replace(/_/g, 'UNDERLINE');
+        //var deviceJSONname = 'device' + deviceJSON.Arg.replace(/_/g, 'UNDERLINE');
         var deviceJSONname = 'device' + deviceJSON.Arg;
         ios.sockets.in(deviceJSONname).emit('device', deviceJSON);
     });
@@ -506,12 +551,16 @@ function init() {
 // -------------------------------------------------------------------
 
 getAllValues('init');
+buffer.initJsonBuffer();
 
 initFinished.on('true', function() {
     mylog('initFinished', 1);
-    server.listen(params.nodePort);
-    var messSuff = (params.useSSL) ? ' with SSL' : ' without SSL';
-    mylog('listen for websocket requests on port ' + params.nodePort + messSuff);
-    connectFHEMserver();
-    init();
+    initCompleteCount++;
+    if (initCompleteCount === initCompleteMax) {
+	    server.listen(params.nodePort);
+	    var messSuff = (params.useSSL) ? ' with SSL' : ' without SSL';
+	    mylog('listen for websocket requests on port ' + params.nodePort + messSuff);
+	    connectFHEMserver();
+	    init();
+    }
 });

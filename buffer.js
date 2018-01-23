@@ -1,9 +1,12 @@
+var net = require('net');
 var events = require('./events');
 var funcs = require('./functions');
+var params = require('./params');
 var mylog = funcs.mylog;
 var initFinished = events.initFinished;
 var aktValues = {};
 var aktTypes = {};
+var jsonBuffer = {};
 
 function readValues(data) {
     var newValues = {};
@@ -124,8 +127,51 @@ function getAllUnitsOf(type) {
     return units;
 }
 
+function initJsonBuffer() {
+	var fhemcmd = net.connect({ port: params.fhemPort, host: params.fhemHost }, function() {
+	    
+	});
+	
+	var answerStr = '';
+	fhemcmd.on('data', function(response) {
+	    answerStr += response.toString().replace("\n", "");
+	});
+	
+	fhemcmd.on('end', function() {
+	    var startPos = answerStr.indexOf('{');
+	    var lastPos = answerStr.lastIndexOf('}');
+	    answerStr = answerStr.substr(startPos, lastPos - startPos + 1);
+	    var jsonFhem = JSON.parse(answerStr);
+	    //console.log(jsonFhem);
+	    
+	    for (var index in jsonFhem.Results) {
+	    	var unit = jsonFhem.Results[index].Name;
+	    	var readings = jsonFhem.Results[index].Readings;
+
+	    	for (var reading in readings) {
+	    		//console.log(reading);
+	    		if (!jsonBuffer[unit]) {
+	    			jsonBuffer[unit] = new Object();
+	    		}
+	    		jsonBuffer[unit][reading] = readings[reading].Value;
+	    	}
+	    }
+	    
+	    initFinished.emit('true');
+	    //console.log(jsonFhem.Results[8].Readings);
+	});
+
+	fhemcmd.on('error', function() {
+	    fhemcmd.destroy();
+	    funcs.mylog('error: telnet connection failed', 0);
+	});	
+	fhemcmd.write('JsonList2;exit\r\n');
+}
+
 exports.checkValue = checkValue;
 exports.readValues = readValues;
 exports.getAllSwitches = getAllSwitches;
 exports.getAllUnitsOf = getAllUnitsOf;
 exports.setActValue = setActValue;
+exports.initJsonBuffer = initJsonBuffer;
+exports.jsonBuffer = jsonBuffer;

@@ -95,6 +95,8 @@ Establish connection to node.js server by:
   * 'getValueOnce'         : requests a value from fhem once
   * 'getValueOnChange'     : subscribes delivery of a single updated value by a websocket connection
   * 'getAllValuesOnChange' : subscribes delivery of all updated values by a websocket connection
+  * 'getReadingOnce'       : requests a reading from fhem once
+  * 'getReadingOnChange'   : subscribes delivery of a reading by a websocket connection
 
 **On client you can emit the following async requests (slower response with much more data):**
 
@@ -104,8 +106,9 @@ Establish connection to node.js server by:
 Example:
 
     socket.emit('getValueOnChange','fhem-device-name'); 
+    socket.emit('getReadingOnChange',{unit: 'unit-name', reading: 'reading-name'}); 
 
-For catching the response define a listener with label 'value' in the first case and label 'device' in the second case.
+For catching the response define a listener with label 'value' or 'reading' in the first case and label 'device' in the second case.
 
 Java example:
 

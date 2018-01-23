@@ -2,6 +2,7 @@
 <html>
 <head>
   <script src="http://your.domain.tld:8086/socket.io/socket.io.js"></script>
+  <script src="nodetest.js"></script>
 </head>
 
 <body>
@@ -13,57 +14,5 @@
    <h2>changed values</h2>
    <div id="container2" style="display:inline-block;width: 45%"></div>
   </div>
-
-<script>
-   var changedValues = '';
-   var socket = io.connect('ws://your.domain.tld:8086',
-                                 {
-                                    timeout: 5000,
-                                    'sync disconnect on unload' : true
-                                 });
-
-   socket.on('connect', function()
-   {
-      socket.emit('getAllValuesOnChange');
-      socket.emit('getAllDevicesOnChange');
-
-      socket.emit('getAllValues', function(data)
-      {
-         var out = '';
-         for (unit in data)
-         {
-            var value = data[unit];
-            out = out + unit + ': ' + value + "<br>";
-         }
-         document.getElementById("container1").innerHTML = out;
-      });
-
-      socket.emit('JsonList2', '', function(data)
-      {
-         console.log(data);
-      });
-   });
-
-   socket.on('value',function(data)
-   {
-      for (unit in data)
-      {
-         var value = data[unit];
-         changedValues = changedValues + unit + ': ' + value + "<br>";
-      }
-      document.getElementById("container2").innerHTML = changedValues;
-   });
-
-   socket.on('device',function(data)
-   {
-      console.log(data);
-   });
-
-   socket.on('disconnect', function()
-   {
-      console.log('disconnected from server');
-   });
-</script>
-
 </body>
 </html>
