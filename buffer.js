@@ -149,16 +149,17 @@ function initJsonBuffer() {
 	    	var readings = jsonFhem.Results[index].Readings;
 
 	    	for (var reading in readings) {
-	    		//console.log(reading);
-	    		if (!jsonBuffer[unit]) {
-	    			jsonBuffer[unit] = new Object();
+	    		if (reading != '__proto__') {
+		    		if (!jsonBuffer[unit]) {
+		    			jsonBuffer[unit] = new Object();
+		    			jsonBuffer[unit]['fhemType'] = jsonFhem.Results[index].Internals.TYPE;
+		    		}
+		    		jsonBuffer[unit][reading] = readings[reading].Value;
 	    		}
-	    		jsonBuffer[unit][reading] = readings[reading].Value;
 	    	}
 	    }
 	    
 	    initFinished.emit('true');
-	    //console.log(jsonFhem.Results[8].Readings);
 	});
 
 	fhemcmd.on('error', function() {
@@ -168,6 +169,27 @@ function initJsonBuffer() {
 	fhemcmd.write('JsonList2;exit\r\n');
 }
 
+function allUnitTypes() {
+	var allUnitTypes = [];
+	
+	for (var key in jsonBuffer) {
+		var fhemType = jsonBuffer[key].fhemType;
+		if (!contains(allUnitTypes, fhemType)) {
+			allUnitTypes.push(fhemType);
+		}
+	}
+	
+	return allUnitTypes;
+}
+
+function contains(a, val) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] == val) {
+            return true;
+        }
+    }
+    return false;
+}
 exports.checkValue = checkValue;
 exports.readValues = readValues;
 exports.getAllSwitches = getAllSwitches;
@@ -175,3 +197,4 @@ exports.getAllUnitsOf = getAllUnitsOf;
 exports.setActValue = setActValue;
 exports.initJsonBuffer = initJsonBuffer;
 exports.jsonBuffer = jsonBuffer;
+exports.allUnitTypes = allUnitTypes;

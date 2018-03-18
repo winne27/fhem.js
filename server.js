@@ -245,9 +245,23 @@ var defListeners = function(socket) {
         callback(response);
     });
 
+    socket.on('getAllReadings', function(callback) {
+    	mylog("getAllReadings fired by client", 1);
+    	callback(buffer.jsonBuffer);
+    });
+  
+    socket.on('getAllUnitTypes', function(callback) {
+    	mylog("getAllUnitTypes fired by client", 0);
+    	callback(buffer.allUnitTypes());
+    });
+
     socket.on('getAllUnitsOf', function(type, callback) {
         var units = buffer.getAllUnitsOf(type);
         callback(units);
+    });
+   
+    socket.on('getVersion', function(callback) {
+    	callback(version.installed);
     });
 
     if (params.extendedMode) {

@@ -53,7 +53,7 @@ then
     then
 		if [ ! -f $PIDDIRCONF ]
 	    then
-	       echo "d /run/fhem 0755 $USER root - -" > $PIDDIRCONF 
+	       echo "d /run/fhem 0755 $USER $USER - -" > $PIDDIRCONF 
 	    fi
 	fi
 
