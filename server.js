@@ -159,15 +159,6 @@ var defListeners = function(socket) {
         }
     });
 
-    socket.on('getDeviceOnChange', function(data) {
-        mylog("request for getDeviceOnChange " + data, 1);
-        //var dataMasked = 'device' + data.replace(/_/g, 'UNDERLINE');
-        var dataMasked = 'device' + data;
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
-            socket.join(dataMasked);
-        }
-    });
-
     socket.on('getAllValuesOnChange', function(data) {
         mylog("request for getAllValuesOnChange", 1);
         if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
@@ -215,6 +206,15 @@ var defListeners = function(socket) {
     		};
     		socket.emit('reading', response);
     	}
+    });
+
+    socket.on('getDeviceOnChange', function(data) {
+        mylog("request for getDeviceOnChange " + data, 1);
+        //var dataMasked = 'device' + data.replace(/_/g, 'UNDERLINE');
+        var dataMasked = 'device' + data;
+        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
+            socket.join(dataMasked);
+        }
     });
     
     socket.on('command', function(cmd, callback) {

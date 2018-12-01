@@ -103,9 +103,16 @@ Establish connection to node.js server by:
   * 'getDeviceOnChange'     : subscribes delivery of a single updated device in JsonList2 format
   * 'getAllDevicesOnChange' : subscribes delivery of all updated devices in JsonList2 format
 
-Example:
+Syntax:
 
+    socket.emit('getAllValuesOnChange'); 
+    socket.emit('getValueOnce','fhem-device-name'); 
     socket.emit('getValueOnChange','fhem-device-name'); 
+    
+    socket.emit('getAllDevicesOnChange'); 
+    socket.emit('getDeviceOnChange','fhem-device-name'); 
+
+    socket.emit('getReadingOnce',{unit: 'unit-name', reading: 'reading-name'}); 
     socket.emit('getReadingOnChange',{unit: 'unit-name', reading: 'reading-name'}); 
 
 For catching the response define a listener with label 'value' or 'reading' in the first case and label 'device' in the second case.
@@ -140,12 +147,12 @@ Javascript example:
     });
 
 **On client you can emit the following sync requests:**
-  * 'command',cmd      : send a fhem command like "list xyz". Response is send back as ack response
-  * 'commandNoResp',cmd: send a fhem command like "set xyz off". No response of this command is send back
-  * 'getAllSwitches'   : returns JSON array with all devices which have state on, off or toggle
-  * 'getAllValues'     : returns JSON array with all devices and their state
-  * 'getAllUnitsOf'    : returns JSON array with all devices of type, there type is a argument
-  * 'JsonList2',cmd    : returns response from JsonList2 as JSON object     
+  * 'command','your_command':       send a fhem command like "list xyz". Response is send back as ack response
+  * 'commandNoResp','your_command': send a fhem command like "set xyz off". No response of this command is send back
+  * 'getAllSwitches':               returns JSON array with all devices which have state on, off or toggle
+  * 'getAllValues':                 returns JSON array with all devices and their state
+  * 'getAllUnitsOf':                returns JSON array with all devices of type, there type is a argument
+  * 'JsonList2','fhem_unit':        returns response from JsonList2 as JSON object     
 
 Java example for getAllSwitches:
 
@@ -182,12 +189,20 @@ Java example for getAllUnitsOf (with "LightScene" as argument type):
    
    Javascript example:
 
+    socket.emit("commandNoResp", "set Bath_Room_Light off");
+   
     socket.emit("getAllUnitsOf", "LightScene", function(data)
     {
         for (unit in data)
         {
            var value = data[unit];
         }
+    });
+
+    socket.emit("JsonList2", "Bathroom", function(data)
+    {
+    	// data contains a Fhem JsonList2 of device Bathroom
+        console.log(data);
     });
 
 **On client you can listen to "version" event (only if in params.js: doCheckVersion = true)**
