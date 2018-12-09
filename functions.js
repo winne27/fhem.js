@@ -25,6 +25,20 @@ exports.mylog = function(msg,level)
    }
 }
 
+exports.myerr = function(socket, tag, data, err)
+{
+	if (params.debug > 0) {
+		console.log(getToday.myHumanReadable() + ' ' + err + ' occured at ' + tag + ' (maybe the next log entry shows the corrupted data)');
+		console.log(data);
+	}
+	var errdata = {
+		tag: tag,
+		errmsg: err,
+		data: data
+	};
+	socket.emit('requestError', errdata);
+}
+
 function pad(number, length)
 {
     var str = '' + number;

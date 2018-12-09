@@ -44,6 +44,11 @@ socket.on('device',function(data) {
 	console.log(data);
 });
 
+socket.on('requestError',function(data) {
+	console.log('requestError');
+	console.log(data);
+});
+
 socket.on('reading',function(data) {
 	console.log('reading');
 	console.log(data);

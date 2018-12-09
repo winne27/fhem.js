@@ -25,6 +25,7 @@ var funcs = require('./functions');
 var buffer = require('./buffer');
 if (params.readDB) var readdb = require('./readdb');
 var mylog = funcs.mylog;
+var myerr = funcs.myerr;
 var initFinished = events.initFinished;
 var exec = require('child_process').exec;
 var version = new Object;
@@ -142,35 +143,50 @@ ios.sockets.on('connection', function(socket) {
 
 var defListeners = function(socket) {
     socket.on('getValueOnce', function(data) {
-        var jsonValue = buffer.checkValue(data);
-        if (jsonValue) {
-            mylog('get value for ' + data, 2);
-            mylog(jsonValue, 2);
-            socket.emit('value', jsonValue);
-        }
+    	try {
+	        var jsonValue = buffer.checkValue(data);
+	        if (jsonValue) {
+	            mylog('get value for ' + data, 2);
+	            mylog(jsonValue, 2);
+	            socket.emit('value', jsonValue);
+	        }
+    	} catch(e) {
+    		myerr(socket, 'getValueOnce', data, e);
+    	}
     });
 
     socket.on('getValueOnChange', function(data) {
-        mylog("request for getValueOnChange " + data, 1);
-        //var dataMasked = data.replace(/_/g, 'UNDERLINE');
-        var dataMasked = data;
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
-            socket.join(dataMasked);
-        }
+    	try {
+	        mylog("request for getValueOnChange " + data, 1);
+	        var dataMasked = data;
+	        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
+	            socket.join(dataMasked);
+	        }
+		} catch(e) {
+			myerr(socket, 'getValueOnChange', data, e);
+		}        
     });
 
     socket.on('getAllValuesOnChange', function(data) {
-        mylog("request for getAllValuesOnChange", 1);
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
-            socket.join('all');
-        }
+    	try {
+    		mylog("request for getAllValuesOnChange", 1);
+    		if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
+    			socket.join('all');
+    		}
+		} catch(e) {
+			myerr(socket, 'getAllValueOnChange', data, e);
+		}       
     });
 
     socket.on('getAllDevicesOnChange', function(data) {
-        mylog("request for getAllDevicesOnChange", 1);
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
-            socket.join('device_all');
-        }
+    	try {
+    		mylog("request for getAllDevicesOnChange", 1);
+    		if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[data]) == 'undefined') {
+    			socket.join('device_all');
+    		}
+		} catch(e) {
+			myerr(socket, 'getAllDevicesOnChange', data, e);
+		}   
     });
 
     socket.on('refreshValues', function(data) {
@@ -189,32 +205,43 @@ var defListeners = function(socket) {
     });
 
     socket.on('getReadingOnChange', function(data) {
-        mylog("request for getReadingOnChange " + data.unit + ' ' + data.reading, 0);
-        var room = data.unit + 'READING' + data.reading;
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[room]) == 'undefined') {
-            socket.join(room);
-        }
+    	try {
+    		mylog("request for getReadingOnChange " + data.unit + ' ' + data.reading, 1);
+    		var room = data.unit + 'READING' + data.reading;
+    		if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[room]) == 'undefined') {
+    			socket.join(room);
+    		}
+		} catch(e) {
+			myerr(socket, 'getReadingOnChange', data, e);
+		}   
     });
     
     socket.on('getReadingOnce', function(data) {
-    	mylog("request for getReading " + data.unit + ' ' + data.reading, 1);
-    	if (buffer.jsonBuffer[data.unit][data.reading]) {
-    		var response = {
-    				unit: data.unit,
-    				reading: data.reading,
-    				value: buffer.jsonBuffer[data.unit][data.reading]
-    		};
-    		socket.emit('reading', response);
-    	}
+    	try {
+    		mylog("request for getReading " + data.unit + ' ' + data.reading, 1);
+    		if (buffer.jsonBuffer[data.unit][data.reading]) {
+    			var response = {
+    					unit: data.unit,
+    					reading: data.reading,
+    					value: buffer.jsonBuffer[data.unit][data.reading]
+    			};
+    			socket.emit('reading', response);
+    		}
+		} catch(e) {
+			myerr(socket, 'getReadingOnce', data, e);
+		}   
     });
 
     socket.on('getDeviceOnChange', function(data) {
-        mylog("request for getDeviceOnChange " + data, 1);
-        //var dataMasked = 'device' + data.replace(/_/g, 'UNDERLINE');
-        var dataMasked = 'device' + data;
-        if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
-            socket.join(dataMasked);
-        }
+    	try {
+    		mylog("request for getDeviceOnChange " + data, 1);
+    		var dataMasked = 'device' + data;
+    		if (typeof(socket.rooms) == 'undefined' || typeof(socket.rooms[dataMasked]) == 'undefined') {
+    			socket.join(dataMasked);
+    		}
+		} catch(e) {
+			myerr(socket, 'getDeviceOnChange', data, e);
+		}   
     });
     
     socket.on('command', function(cmd, callback) {
@@ -314,7 +341,7 @@ var defListeners = function(socket) {
 
 fhemSocket = new net.Socket();
 process.on('uncaughtException', function(err) {
-    mylog('process error: ' + err + ' - retry in 10 secs', 0);
+    mylog('process error: ' + err, 0);
 });
 
 fhemSocket.on('connect', function(data) {

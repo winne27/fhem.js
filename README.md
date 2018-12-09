@@ -115,7 +115,7 @@ Syntax:
     socket.emit('getReadingOnce',{unit: 'unit-name', reading: 'reading-name'}); 
     socket.emit('getReadingOnChange',{unit: 'unit-name', reading: 'reading-name'}); 
 
-For catching the response define a listener with label 'value' or 'reading' in the first case and label 'device' in the second case.
+For catching the response define a listener with label 'value' or 'reading' in the first case and label 'device' in the second case. Furthermore prograns can listen on 'requestError'.
 
 Java example:
 
@@ -144,6 +144,12 @@ Javascript example:
         {
            var value = data[unit];
         }
+    });
+	
+	// listen for errors of previous requests
+    socket.on('requestError',function(error)
+    {
+		console.log(error);
     });
 
 **On client you can emit the following sync requests:**
