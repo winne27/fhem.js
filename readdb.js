@@ -43,7 +43,7 @@ function getDBvalue(dbObj,fhemSocket)
       if (!err)
       {
          var value = rows[0][dbObj.column];
-         fhemSocket.write('set ' + dbObj.fhem_name + ' ' + value + '\r\n');
+         fhemSocket.write(new Buffer('set ' + dbObj.fhem_name + ' ' + value + '\r\n'));
       }
       else
       {

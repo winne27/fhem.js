@@ -14,7 +14,6 @@ function readValues(data) {
     var lastHeader;
     var allLines = data.toString().split("\n");
 
-    var selLines = [];
     var ln = 0;
     allLines.forEach(function(line) {
         line = line.trim();
@@ -166,7 +165,7 @@ function initJsonBuffer() {
 	    fhemcmd.destroy();
 	    funcs.mylog('error: telnet connection failed', 0);
 	});	
-	fhemcmd.write('JsonList2;exit\r\n');
+	fhemcmd.write(new Buffer("JsonList2;exit\r\n"));
 }
 
 function allUnitTypes() {
